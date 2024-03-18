@@ -71,4 +71,16 @@ export class BoardService {
             boardId : +boardId
         })
     }
+
+    // 보드 목록
+    async boardList () {
+    const boardListUp = await this.boardRepository.find({
+        select : {
+            boardId : true,
+            boardName : true,
+            boardDescription : true
+        } 
+    })
+    return { boardListUp }
+    }
 }

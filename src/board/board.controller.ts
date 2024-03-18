@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/createBoard.dto';
 import { Role } from 'src/types/role.type';
@@ -36,5 +36,12 @@ export class BoardController {
     async deleteBoard (@MemberInfo() member : Members, @Param('boardId') boardId : number, @Body() deleteBoardDto : DeleteBoardDto) {
         await this.boardService.deleteBoard(member, boardId, deleteBoardDto)
     return { message : '보드 삭제가 완료되었습니다.' }
+    }
+
+    // 보드 목록
+    @Get('')
+    async boardList () {
+    const boardListUp = await this.boardService.boardList()
+    return { boardListUp }
     }
 }
