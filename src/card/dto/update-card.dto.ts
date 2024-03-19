@@ -16,12 +16,7 @@ export class UpdateCardDto {
   @IsString()
   cardColor: string;
 
-  @IsString()
-  @IsUrl()
-  cardImage: string;
-
   @IsArray()
   @ArrayMinSize(1)
-  @ArrayMaxSize(1)
   assignedTo: number[];
 }

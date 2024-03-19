@@ -6,12 +6,14 @@ import { Card } from './entities/card.entity';
 import { Repository } from 'typeorm';
 import _ from 'lodash';
 import { NotFoundError } from 'rxjs';
+import { GroupService } from 'src/group/group.service';
 
 @Injectable()
 export class CardService {
   constructor(
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
+    private readonly groupService: GroupService,
   ) {}
 
   async create(createCardDto: CreateCardDto, columnId: number) {
@@ -37,33 +39,45 @@ export class CardService {
   }
 
   async update(
+    groupId: number,
     columnId: number,
     cardId: number,
     updateCardeDto: UpdateCardDto,
-    file: Express.Multer.File,
   ) {
+    const { cardName, cardDescription, cardColor, assignedTo } = updateCardeDto;
+
     const card = await this.cardRepository.findOneBy({ columnId, cardId });
 
     if (_.isNil(card)) {
       throw new NotFoundException('카드를 찾지 못 했습니다.');
     }
 
-    if (updateCardeDto.cardName) {
-      card.cardName = updateCardeDto.cardName;
+    if (cardName) {
+      card.cardName = cardName;
     }
-    if (updateCardeDto.cardDescription) {
-      card.cardDescription = updateCardeDto.cardDescription;
+    if (cardDescription) {
+      card.cardDescription = cardDescription;
     }
-    if (updateCardeDto.cardColor) {
-      card.cardColor = updateCardeDto.cardColor;
+    if (cardColor) {
+      card.cardColor = cardColor;
     }
-    if (updateCardeDto.assignedTo) {
-      card.assignedTo = updateCardeDto.assignedTo;
+    if (assignedTo) {
+      await this.groupService.compare(+groupId, assignedTo);
+      if (card.assignedTo === assignedTo) {
+        card.assignedTo = null;
+      }
+      card.assignedTo = assignedTo;
     }
+
+    await this.cardRepository.save(card);
   }
 
   async delete(columnId: number, cardId: number) {
     this.findOne(columnId, cardId);
     await this.cardRepository.delete({ columnId, cardId });
+  }
+
+  private async uploadImage(file: Express.Multer.File): Promise<string> {
+    return;
   }
 }

@@ -29,14 +29,8 @@ export class Card {
   @Column({ type: 'varchar', nullable: true })
   cardColor: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  lastUpdateMember: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  cardImage: string;
-
   @Column({ type: 'json', nullable: true })
-  assignedTo: number[];
+  assignedTo: any[];
 
   @Column()
   columnId: number;

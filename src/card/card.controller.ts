@@ -11,6 +11,8 @@ import {
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { GroupInfo } from 'util/groupInfo.decorator';
+import { Group } from 'src/group/entities/group.entity';
 
 @Controller('card')
 export class CardController {
@@ -39,12 +41,12 @@ export class CardController {
 
   @Patch(':columnId/:cardId')
   update(
+    @GroupInfo() group: Group,
     @Param('columnId') columnId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardeDto: UpdateCardDto,
-    @UploadedFile() file: Express.Multer.File,
   ) {
-    this.cardService.update(+columnId, +cardId, updateCardeDto, file);
+    this.cardService.update(group.groupId, +columnId, +cardId, updateCardeDto);
   }
 
   @Delete(':columnId/:cardId')
