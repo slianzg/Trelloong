@@ -65,20 +65,42 @@ export class MemberService {
     };
   }
 
-  // findAll() {
-  //   return `This action returns all member`;
-  // }
-
   //아이디로 회원 정보 가져오기
   async findOneByMemberId(memberId: number) {
     return await this.memberRepository.findOneBy({ memberId });
   }
 
   //회원 정보 수정
-  async updateMyInfo(memberId: number, updateMemberDto: UpdateMemberDto) {}
+  async updateMyInfo(memberId: number, updateMemberDto: UpdateMemberDto) {
+    const member = await this.memberRepository.findOne({
+      where: { memberId },
+      select: ['password'],
+    });
+
+    const { password, memberName, contact } = updateMemberDto;
+
+    if (!(await compare(password, member.password))) {
+      throw new UnauthorizedException('비밀번호를 확인해주세요.');
+    }
+
+    await this.memberRepository.update(memberId, { memberName, contact });
+  }
 
   //회원 탈퇴
-  async withdraw(memberId: number, deleteMemberDto: DeleteMemberDto) {}
+  async withdraw(memberId: number, deleteMemberDto: DeleteMemberDto) {
+    const member = await this.memberRepository.findOne({
+      where: { memberId },
+      select: ['password'],
+    });
+
+    const { password } = deleteMemberDto;
+
+    if (!(await compare(password, member.password))) {
+      throw new UnauthorizedException('비밀번호를 확인해주세요.');
+    }
+
+    await this.memberRepository.softDelete({ memberId });
+  }
 
   //이메일로 회원정보 찾기(이메일 중복확인)
   async findByEmail(email: string) {
