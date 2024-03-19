@@ -15,6 +15,7 @@ import { Column } from './column/entities/column.entity';
 import { Card } from './card/entities/card.entity';
 import { Group } from './group/entities/group.entity';
 import { Comment } from './comment/entities/comment.entity';
+import { AuthModule } from './auth/auth.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -49,6 +50,7 @@ const typeOrmModuleOptions = {
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    AuthModule,
     MemberModule,
     BoardModule,
     ColumnModule,
