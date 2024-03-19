@@ -35,8 +35,8 @@ export class Card {
   @Column({ type: 'varchar', nullable: true })
   cardImage: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  assignedTo: string;
+  @Column({ type: 'json', nullable: true })
+  assignedTo: number[];
 
   @Column()
   columnId: number;
