@@ -6,13 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  UploadedFile,
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { GroupInfo } from 'util/groupInfo.decorator';
-import { Group } from 'src/group/entities/group.entity';
+import { MemberInfo } from 'util/memberInfo.decorator';
+import { Member } from 'src/member/entities/member.entity';
 
 @Controller('card')
 export class CardController {
@@ -41,12 +40,12 @@ export class CardController {
 
   @Patch(':columnId/:cardId')
   update(
-    @GroupInfo() group: Group,
+    @MemberInfo() member: Member,
     @Param('columnId') columnId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardeDto: UpdateCardDto,
   ) {
-    this.cardService.update(group.groupId, +columnId, +cardId, updateCardeDto);
+    this.cardService.update(member.boardId, +columnId, +cardId, updateCardeDto);
   }
 
   @Delete(':columnId/:cardId')

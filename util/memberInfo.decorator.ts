@@ -1,9 +1,9 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
-import { Group } from 'src/group/entities/group.entity';
+import { Member } from 'src/member/entities/member.entity';
 
 export const GroupInfo = createParamDecorator(
-  (data, ctx: ExecutionContext): Group => {
+  (data, ctx: ExecutionContext): Member => {
     const request = ctx.switchToHttp().getRequest();
-    return request.group ? request.group : null;
+    return request.member ? request.member : null;
   },
 );

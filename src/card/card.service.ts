@@ -5,15 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
 import { Repository } from 'typeorm';
 import _ from 'lodash';
-import { NotFoundError } from 'rxjs';
-import { GroupService } from 'src/group/group.service';
+import { MemberService } from 'src/member/member.service';
 
 @Injectable()
 export class CardService {
   constructor(
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
-    private readonly groupService: GroupService,
+    private readonly memberService: MemberService,
   ) {}
 
   async create(createCardDto: CreateCardDto, columnId: number) {
@@ -38,8 +37,8 @@ export class CardService {
     }
   }
 
-  async update(
-    groupId: number,
+  async cardUpdate(
+    boardId: number,
     columnId: number,
     cardId: number,
     updateCardeDto: UpdateCardDto,
@@ -62,11 +61,14 @@ export class CardService {
       card.cardColor = cardColor;
     }
     if (assignedTo) {
-      await this.groupService.compare(+groupId, assignedTo);
-      if (card.assignedTo === assignedTo) {
-        card.assignedTo = null;
+      await this.memberService.compare(+boardId, assignedTo);
+      for (let existId in card.assignedTo) {
+        for (let inputId in assignedTo) {
+          existId === inputId
+            ? existId === null
+            : card.assignedTo.push(inputId);
+        }
       }
-      card.assignedTo = assignedTo;
     }
 
     await this.cardRepository.save(card);
@@ -75,9 +77,5 @@ export class CardService {
   async delete(columnId: number, cardId: number) {
     this.findOne(columnId, cardId);
     await this.cardRepository.delete({ columnId, cardId });
-  }
-
-  private async uploadImage(file: Express.Multer.File): Promise<string> {
-    return;
   }
 }
