@@ -90,7 +90,7 @@ export class UserService {
   async withdraw(userId: number, deleteUserDto: DeleteUserDto) {
     const user = await this.userRepository.findOne({
       where: { userId },
-      select: ['password'],
+      select: ['email', 'password'],
     });
 
     const { password } = deleteUserDto;
@@ -98,6 +98,9 @@ export class UserService {
     if (!(await compare(password, user.password))) {
       throw new UnauthorizedException('비밀번호를 확인해주세요.');
     }
+
+    const deletedUserEmail = `${user.email}_deleted_${Date.now()}`;
+    await this.userRepository.update(userId, { email: deletedUserEmail }); //삭제하려는 유저 이메일 변경
 
     await this.userRepository.softDelete({ userId });
   }
