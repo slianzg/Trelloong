@@ -4,12 +4,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Request as RequestType } from 'express';
 import _ from 'lodash';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { MemberService } from 'src/member/member.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly memberService: MemberService,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {
     super({
@@ -31,10 +31,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const member = await this.memberService.findByEmail(payload.email);
-    if (_.isNil(member)) {
+    const user = await this.userService.findByEmail(payload.email);
+    if (_.isNil(user)) {
       throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
     }
-    return member;
+    return user;
   }
 }
