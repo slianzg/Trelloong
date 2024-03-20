@@ -13,7 +13,7 @@ export class Comment {
     memberId: number;
 
     @IsString()
-    @Column('date', { nullable: false })
+    @Column('varchar', { nullable: false })
     @IsNotEmpty({ message: '내용을 입력하세요.' })
     commentContent: string;
 

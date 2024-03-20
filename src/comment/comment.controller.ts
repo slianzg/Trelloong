@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { validate } from 'class-validator';
+import { userInfo } from 'os';
+import { Member } from 'src/member/entities/member.entity';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(private readonly commentService: CommentService) { }
 
+  // @UseGuards(AuthGuard(""))
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  async createComment(
+    @Query("cardId") cardId: number,
+    @Body() createCommentDto: CreateCommentDto,
+    // @memberInfo() member: Member
+  ) {
+    await validate(createCommentDto)
+
+    // createCommentDto.memberId = member.memberId;
+
+    // await this.cardService.findCardById(cardId)
+    createCommentDto.cardId = cardId;
+
+    return await this.commentService.createComment(createCommentDto)
   }
 
   @Get()
-  findAll() {
-    return this.commentService.findAll();
+  async findComments(
+    @Query("cardId") cardId: number
+  ) {
+    // await this.cardService.findCardById(cardId)
+
+    return await this.commentService.findComments(cardId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
-  }
+  
 }
