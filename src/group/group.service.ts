@@ -1,6 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Group } from './entities/group.entity';
 import { Repository } from 'typeorm';
@@ -12,10 +10,6 @@ export class GroupService {
     @InjectRepository(Group)
     private readonly groupRepository: Repository<Group>,
   ) {}
-
-  create(createGroupDto: CreateGroupDto) {
-    return 'This action adds a new group';
-  }
 
   findAll() {
     return `This action returns all group`;
@@ -30,10 +24,6 @@ export class GroupService {
         throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
       }
     }
-  }
-
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
   }
 
   remove(id: number) {
