@@ -1,27 +1,25 @@
-import { group } from "console";
 import { Columns } from "src/columns/entities/column.entity";
-import { Group } from "src/group/entities/group.entity";
 import { Members } from "src/member/entities/member.entity";
+import { User } from "src/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
     name: 'boards',
   })
-  // user 라는 테이블을 대표하는 객체
-  // 이걸 통해 db와 orm이 통신함
   export class Boards {
     @PrimaryGeneratedColumn()
     boardId: number
 
-    @Column({ type: 'bigint', name : 'memberId', nullable : false })
-    memberId : number
 
-    @ManyToOne(() => Members, (members) => members.boards)
-    @JoinColumn({ name : 'memberId' })
-    members : Members
+    @Column({ type: 'bigint', name : 'userId', nullable : false })
+    userId : number
 
-    @OneToOne(() => Group, (group) => group.boardId)
-    group: Group[]
+    @ManyToOne(() => User, (user) => user.userId)
+    @JoinColumn({ name : 'userId' })
+    user : User
+
+    @OneToMany(() => Members, (members) => members.boardId)
+    members: Members[]
 
     @OneToMany(() => Columns, (columns) => columns.boardId)
     columns: Columns[]

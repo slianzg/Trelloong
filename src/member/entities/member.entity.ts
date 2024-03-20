@@ -1,5 +1,5 @@
 import { Boards } from "src/board/entities/board.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
     name: 'members',
@@ -8,8 +8,12 @@ export class Members {
     @PrimaryGeneratedColumn()
     memberId : number
 
-    @OneToMany(() => Boards, (boards) => boards.memberId)
-    boards: Boards[]
+    @Column({ type: 'bigint', name : 'boardId', nullable : false })
+    boardId : number
+
+    @ManyToOne(() => Boards, (boards) => boards.boardId)
+    @JoinColumn({ name : 'boardId' })
+    boards: Boards
 
     @Column({ type: 'varchar', name : 'memberName', nullable: false })
     memberName : string
