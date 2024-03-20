@@ -1,4 +1,11 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateColumnDto } from './create-column.dto';
 
-export class UpdateColumnDto extends PartialType(CreateColumnDto) {}
+import { IsString } from 'class-validator';
+
+export class UpdateColumnDto  {
+
+
+    @IsString()
+    columName: string;
+
+    
+}

@@ -1,3 +1,5 @@
+
+import { Boards } from 'src/board/entities/board.entity';
 import {
     Column,
     Entity,
@@ -22,7 +24,8 @@ import {
     columnOrder: number;
   
 
-  
-    // @ManyToOne(() => Board, (board) => board.id)
-    // board: Board[];
+    @Column()
+    boardId: number;
+    // @ManyToOne(() => Boards, (board) => board.boardId)
+    // board: Boards[];
   }
