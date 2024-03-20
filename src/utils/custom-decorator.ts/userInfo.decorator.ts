@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const MemberInfo = createParamDecorator(
+export const UserInfo = createParamDecorator(
   // ExecutionContext : 현재 요청의 사용자 정보를 추출하는 역할
   (data: unknown, ctx: ExecutionContext) => {
     // http 요청 객체를 가져와서

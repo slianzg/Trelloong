@@ -14,17 +14,19 @@ import { Role } from 'src/types/role.type';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { UpdatedBoardDto } from './dto/updatedBoard.dto';
-import { Members } from 'src/member/entities/member.entity';
-import { MemberInfo } from 'src/utils/memborInfo.decorator';
+import { UserInfo } from 'src/utils/custom-decorator.ts/userInfo.decorator';
 import { DeleteBoardDto } from './dto/deleteBoard.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { InviteBoardDto } from './dto/inviteBoard.dto';
+import { User } from 'src/user/entities/user.entity';
+import { AuthConfirmDto } from './dto/authConfirm.dto';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('boards')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   // 보드 생성
-  @UseGuards(RolesGuard)
-  @Roles(Role.Admin)
   @Post('create')
   async createBoard(@Body() createBoardDto: CreateBoardDto) {
     const boardInfo = await this.boardService.createBoard(createBoardDto);
@@ -32,6 +34,7 @@ export class BoardController {
   }
 
   // 보드 수정
+  @Roles(Role.Admin)
   @Patch(':boardId')
   async updatedBoard(
     @Param('boardId') boardId: number,
@@ -49,11 +52,11 @@ export class BoardController {
   @Roles(Role.Admin)
   @Delete(':boardId')
   async deleteBoard(
-    @MemberInfo() member: Members,
+    @UserInfo() user : User,
     @Param('boardId') boardId: number,
     @Body() deleteBoardDto: DeleteBoardDto,
   ) {
-    await this.boardService.deleteBoard(member, boardId, deleteBoardDto);
+    await this.boardService.deleteBoard(user, boardId, deleteBoardDto);
     return { message: '보드 삭제가 완료되었습니다.' };
   }
 
@@ -65,11 +68,16 @@ export class BoardController {
   }
 
   // 멤버 초대
-  async inviteMember () {
-    // 1. Group에 등록된 인원 중 한명의 정보(이메일)를 받아온다.
-  
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
+  @Post(':boardId')
+  async inviteMember (@Param('boardId') boardId : number, @Body() inviteBoardDto : InviteBoardDto ) {
+    await this.boardService.inviteMember(boardId, inviteBoardDto)
   }
-  
-  // 2. 그 사람의 이메일로 노드메일러를 통해 인증 메일을 발송한다.
-  // 3. 인증 번호를 입력하면 등록 완료.....?
+
+  // 인증 확인
+  @Patch('/verify')
+  async confirmToken (@Body() authConfirmDto : AuthConfirmDto) {
+    await this.boardService.confirmToken(authConfirmDto)
+  }
 }

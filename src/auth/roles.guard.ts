@@ -11,7 +11,7 @@ export class RolesGuard extends AuthGuard('jwt') implements CanActivate {
   constructor(private reflector: Reflector) {
     super();
   }
-  // canActivate : true면 통과, false면 ㄲㅈ
+  // canActivate : true면 통과, false면 
   async canActivate(context: ExecutionContext) {
     const authenticated = await super.canActivate(context);
     if (!authenticated) {

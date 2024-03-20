@@ -7,7 +7,6 @@ import { JwtStrategy } from "./jwt.strategy";
 
 @Module({
     imports: [
-      // passport를 쓸 거고 기본적으론 jwt를 쓸 거다.   session : false == stateless
       PassportModule.register({ defaultStrategy: 'jwt', session: false }),
       JwtModule.registerAsync({
         useFactory: (config: ConfigService) => ({
@@ -15,7 +14,7 @@ import { JwtStrategy } from "./jwt.strategy";
         }),
         inject: [ConfigService],
       }),
-      BoardModule // 추가!
+      BoardModule
     ],
     providers: [JwtStrategy],
   })

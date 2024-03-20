@@ -1,4 +1,6 @@
 import { Boards } from "src/board/entities/board.entity";
+import { Role } from "src/types/role.type";
+import { User } from "src/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
@@ -8,6 +10,9 @@ export class Members {
     @PrimaryGeneratedColumn()
     memberId : number
 
+    @Column({ type: 'bigint', name : 'userId', nullable : false})
+    userId : number
+
     @Column({ type: 'bigint', name : 'boardId', nullable : false })
     boardId : number
 
@@ -15,15 +20,14 @@ export class Members {
     @JoinColumn({ name : 'boardId' })
     boards: Boards
 
-    @Column({ type: 'varchar', name : 'memberName', nullable: false })
-    memberName : string
+    @ManyToOne(() => User, (users) => users.userId)
+    @JoinColumn({ name : 'userId' })
+    users : User
 
-    @Column({ type: 'varchar', name : 'email', nullable: false })
-    email : string
+    @Column({ type: 'enum', nullable: false })
+    role : Role
 
-    @Column({ type: 'varchar', name : 'password', nullable: false })
-    password : string
-
-    @Column({ type: 'varchar', name : 'contact', nullable: false })
-    contact : string
+    // 인증 번호 컬럼인데 어디다 둬야 최선인지 모르겠어서 일단 멤버에다 추가
+    @Column({ type : 'bigint', select : false })
+    verificationToken : number
 }

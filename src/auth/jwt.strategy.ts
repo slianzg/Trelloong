@@ -2,14 +2,15 @@ import { Request as RequestType } from 'express';
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
-import { ExtractJwt } from "passport-jwt";
+import { ExtractJwt, Strategy } from "passport-jwt";
 import { MemberService } from "src/member/member.service";
 import _ from 'lodash';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly memberService: MemberService,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {
     super({
@@ -29,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return null;
   }
   async validate(payload: any) {
-    const user = await this.memberService.findUserEmail(payload.email);
+    const user = await this.userService.findUserEmail(payload.email);
     if (_.isNil(user)) {
       throw new NotFoundException('해당하는 사용자를 찾을 수 없습니다.');
     }
