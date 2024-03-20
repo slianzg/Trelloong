@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -51,7 +53,7 @@ export class UserService {
     });
 
     if (_.isNil(user)) {
-      throw new UnauthorizedException('이메일을 확인해주세요.');
+      throw new NotFoundException('이메일을 확인해주세요.');
     }
 
     if (!(await compare(password, user.password))) {
@@ -81,6 +83,10 @@ export class UserService {
 
     if (!(await compare(password, user.password))) {
       throw new UnauthorizedException('비밀번호를 확인해주세요.');
+    }
+
+    if (!userName && !contact) {
+      throw new BadRequestException('수정할 값을 입력해주세요.');
     }
 
     await this.userRepository.update(userId, { userName, contact });
