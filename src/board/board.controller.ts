@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
@@ -28,8 +29,9 @@ export class BoardController {
 
   // 보드 생성
   @Post('create')
-  async createBoard(@Body() createBoardDto: CreateBoardDto) {
-    const boardInfo = await this.boardService.createBoard(createBoardDto);
+  async createBoard(@Body() createBoardDto: CreateBoardDto, @Req() req) {
+    const { userId } = req.user
+    const boardInfo = await this.boardService.createBoard(createBoardDto, userId);
     return { message: '보드 생성이 완료되었습니다.', boardInfo };
   }
 

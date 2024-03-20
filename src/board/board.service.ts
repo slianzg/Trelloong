@@ -26,12 +26,17 @@ export class BoardService {
         ) {}
     
     // 보드 생성
-    async createBoard (createBoardDto : CreateBoardDto) {
+    async createBoard (createBoardDto : CreateBoardDto, userId : number) {
     const boardInfo = await this.boardRepository.save({
             boardName : createBoardDto.name,
             boardDescription : createBoardDto.description,
             boardColor : createBoardDto.color
         })
+    await this.memberRepository.save({
+        userId : userId,
+        boardId : boardInfo.boardId,
+        role : Role.Admin
+    })
         return boardInfo
     }
 
