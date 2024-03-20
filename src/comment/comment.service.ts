@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -15,7 +15,7 @@ export class CommentService {
     return await this.commentRepository.save(createCommentDto)
   }
 
-  async findComments(cardId: number) {
+  async findAllComments(cardId: number) {
     const comments = await this.commentRepository.findBy({ cardId })
 
     if (!comments) {
@@ -24,5 +24,37 @@ export class CommentService {
     return comments;
   } 
 
+  async findCommentById(commentId: number) {
+    const comment = await this.commentRepository.findOneBy({ commentId });
 
+    if (!comment) {
+      throw new NotFoundException('해당하는 댓글을 찾을 수 없습니다.');
+    }
+
+    return comment;
+  }
+
+  async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto) {
+    const comment = await this.findCommentById(commentId);
+
+    if (comment.userId !== userId) {
+      throw new UnauthorizedException('해당 댓글을 수정할 권한이 없습니다.');
+    }
+
+    const updateComment = await this.commentRepository.update(comment, updateCommentDto);
+
+    return updateComment;
+  }
+
+  async deleteComment(commentId: number, userId: number) {
+    const comment = await this.findCommentById(commentId);
+
+    if (comment.userId !== userId) {
+      throw new UnauthorizedException('해당 댓글을 삭제할 권한이 없습니다.');
+    }
+
+    return await this.commentRepository.delete(comment);
+  }
+
+  
 }

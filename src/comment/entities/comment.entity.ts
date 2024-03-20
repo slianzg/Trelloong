@@ -10,7 +10,7 @@ export class Comment {
 
     @IsNumber()
     @Column('varchar', { nullable: false })
-    memberId: number;
+    userId: number;
 
     @IsString()
     @Column('varchar', { nullable: false })
@@ -26,7 +26,7 @@ export class Comment {
     createdAt: Date;
 
     // @ManyToOne(() => Member, (member) => member.comments)
-    // @JoinColumn({ name: "memberId", referencedColumnName: "memberId" })
+    // @JoinColumn({ name: "userId", referencedColumnName: "memberId" })
     // member: Member;
 
     // @ManyToOne(() => Card, (card) => card.comments)
