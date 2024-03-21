@@ -1,12 +1,15 @@
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class UpdatedBoardDto {
     @IsString()
-    name : string
+    @IsOptional()
+    boardName : string
 
     @IsString()
-    description : string
+    @IsOptional()
+    boardDescription : string
 
     @IsString()
-    color : string
+    @IsOptional()
+    boardColor : string
 }

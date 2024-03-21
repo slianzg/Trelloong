@@ -9,8 +9,8 @@ export class User {
     @PrimaryGeneratedColumn()
     userId : number
 
-    @OneToMany(() => Boards, (boards) => boards.userId)
-    board : Boards[]
+    @OneToMany(() => Boards, (board) => board.user)
+    boards : Boards[]
 
     @OneToMany(() => Members, (members) => members.userId)
     members : Members[]

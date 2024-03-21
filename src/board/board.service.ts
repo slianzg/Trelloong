@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Boards } from './entities/board.entity';
@@ -27,10 +27,11 @@ export class BoardService {
     
     // 보드 생성
     async createBoard (createBoardDto : CreateBoardDto, userId : number) {
-    const boardInfo = await this.boardRepository.save({
+        const boardInfo = await this.boardRepository.save({
             boardName : createBoardDto.name,
             boardDescription : createBoardDto.description,
-            boardColor : createBoardDto.color
+            boardColor : createBoardDto.color,
+            user : { userId }   // 왜 userId,boardId까지 끌고오는 거지..?
         })
     await this.memberRepository.save({
         userId : userId,
@@ -41,23 +42,44 @@ export class BoardService {
     }
 
     // 보드 수정
-    async updatedBoard (boardId : number, updatedBoardDto : UpdatedBoardDto) {
+    async updatedBoard (boardId : number, updatedBoardDto : UpdatedBoardDto, userId : number) {
+        // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
+        const boardMember = await this.memberRepository.findOne({
+            where : { userId, boardId }
+        })
+        if (!boardMember) {
+            throw new NotFoundException ('보드 멤버가 아닙니다.')
+        }
+        // 보드 존재 여부
         const findBoard = await this.boardRepository.findOne({
             where : {
                 boardId : +boardId
             }
         })
-        
         if (!findBoard) {
             throw new NotFoundException ('수정하려는 보드가 존재하지 않습니다.')
         }
-
-        const afterBoardInfo = await this.boardRepository.update(boardId,{
-            boardName : updatedBoardDto.name,
-            boardDescription : updatedBoardDto.description,
-            boardColor : updatedBoardDto.color
+        // 어드민만 수정 가능
+        const findAminBoard = await this.memberRepository.findOne({
+            where : {
+                boardId,
+                userId,
+                role : Role.Admin
+            }
         })
-    return { afterBoardInfo }
+        if (!findAminBoard) {
+            throw new NotAcceptableException ('어드민인 보드만 수정이 가능합니다.')
+        }
+        // 3칸 다 비어 있을 경우
+        if (!updatedBoardDto.boardName && !updatedBoardDto.boardDescription && !updatedBoardDto.boardColor) {
+            throw new BadRequestException ('수정사항이 없습니다.')
+        }
+
+        await this.boardRepository.update(boardId,{
+            boardName : updatedBoardDto.boardName,
+            boardDescription : updatedBoardDto.boardDescription,
+            boardColor : updatedBoardDto.boardColor
+        })
     }
 
     // 보드 삭제
@@ -65,7 +87,24 @@ export class BoardService {
         if (!boardId) {
             throw new NotFoundException ('삭제 하려는 보드가 존재하지 않습니다.')
         }
-        
+        // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
+        const boardMember = await this.memberRepository.findOne({
+            where : { userId : user.userId, boardId }
+        })
+        if (!boardMember) {
+            throw new NotFoundException ('보드 멤버가 아닙니다.')
+        }
+        // 어드민만 수정 가능
+        const findAminBoard = await this.memberRepository.findOne({
+            where : {
+                boardId,
+                userId : user.userId,
+                role : Role.Admin
+            }
+        })
+        if (!findAminBoard) {
+            throw new NotAcceptableException ('어드민인 보드만 수정이 가능합니다.')
+        }
         // 삭제하기 위한 비밀번호 검증
         const savedPassword = await this.userRepository.findOne({
             where : {
@@ -79,9 +118,8 @@ export class BoardService {
         if (!(await bcrypt.compare(deleteBoardDto.password, savedPassword.password))) {
             throw new UnauthorizedException('비밀번호를 확인해주세요.');
         }
-
         this.boardRepository.delete({
-            boardId : +boardId
+            boardId : boardId
         })
     }
 
@@ -98,12 +136,19 @@ export class BoardService {
     }
 
     // 멤버 초대
-    async inviteMember (boardId : number, inviteBoardDto : InviteBoardDto) {
+    async inviteMember (boardId : number, inviteBoardDto : InviteBoardDto, userId : number) {
+        // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
+        const boardMember = await this.memberRepository.findOne({
+            where : { userId, boardId }
+        })
+        if (!boardMember) {
+            throw new NotFoundException ('보드 멤버가 아닙니다.')
+        }
         // 본인이 어드민인 보드에 초대하는 것이 맞는지 확인
         const findOneBoard = await this.memberRepository.findOne({
             where : {
                 boardId : boardId,
-                //userId : userId,
+                userId : userId,
                 role : Role.Admin
             }
         })
@@ -147,20 +192,23 @@ export class BoardService {
                 email : authConfirmDto.email
             },
             select : {
-                email : true,
-                members : {
-                    verificationToken : true
-                }
-            },
-            relations : ['members']
+                userId : true,
+            }
         })
+        const member = await this.memberRepository.find({
+            where : {
+                userId : halfMember.userId,
+                verificationToken : authConfirmDto.verificationToken
+            }
+        })
+        //console.log(member,"---------------------",authConfirmDto.verificationToken)
         if (!halfMember) {
             throw new ConflictException ('존재 하지 않는 이메일 입니다.')
         }
-        if (halfMember.members[0].verificationToken !== authConfirmDto.verificationToken) {
+        if (!member) {
             throw new ConflictException ('인증번호가 일치하지 않습니다.')
         }
-        await this.memberRepository.update(halfMember.email,{
+        await this.memberRepository.update(member[0].memberId,{
             role : Role.Member
         })
     }

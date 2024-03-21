@@ -35,23 +35,25 @@ export class BoardController {
     return { message: '보드 생성이 완료되었습니다.', boardInfo };
   }
 
+  // 인증 확인
+  @Patch('/verify')
+  async confirmToken (@Body() authConfirmDto : AuthConfirmDto) {
+    await this.boardService.confirmToken(authConfirmDto)
+  }
+
   // 보드 수정
-  @Roles(Role.Admin)
   @Patch(':boardId')
   async updatedBoard(
     @Param('boardId') boardId: number,
-    @Body() updatedBoardDto: UpdatedBoardDto,
-  ) {
-    const afterBoardInfo = await this.boardService.updatedBoard(
-      boardId,
-      updatedBoardDto,
-    );
-    return { message: '보드 수정이 완료되었습니다.', afterBoardInfo };
+    @Body() updatedBoardDto: UpdatedBoardDto, @Req() req) {
+    const { userId } = req.user
+    await this.boardService.updatedBoard(boardId, updatedBoardDto, userId);
+    return { message: '보드 수정이 완료되었습니다.'};
   }
 
   // 보드 삭제
-  @UseGuards(RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(RolesGuard)
+  // @Roles(Role.Admin)
   @Delete(':boardId')
   async deleteBoard(
     @UserInfo() user : User,
@@ -70,16 +72,13 @@ export class BoardController {
   }
 
   // 멤버 초대
-  @UseGuards(RolesGuard)
-  @Roles(Role.Admin)
+  // @UseGuards(RolesGuard)
+  // @Roles(Role.Admin)
   @Post(':boardId')
-  async inviteMember (@Param('boardId') boardId : number, @Body() inviteBoardDto : InviteBoardDto ) {
-    await this.boardService.inviteMember(boardId, inviteBoardDto)
+  async inviteMember (@Param('boardId') boardId : number, @Body() inviteBoardDto : InviteBoardDto, @Req() req) {
+    const { userId } = req.user
+    await this.boardService.inviteMember(boardId, inviteBoardDto, userId)
   }
 
-  // 인증 확인
-  @Patch('/verify')
-  async confirmToken (@Body() authConfirmDto : AuthConfirmDto) {
-    await this.boardService.confirmToken(authConfirmDto)
-  }
+  
 }

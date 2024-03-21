@@ -10,12 +10,11 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGene
     @PrimaryGeneratedColumn()
     boardId: number
 
-
     @Column({ type: 'bigint', name : 'userId', nullable : false })
     userId : number
 
-    @ManyToOne(() => User, (user) => user.userId)
-    @JoinColumn({ name : 'userId' })
+    @ManyToOne(() => User, (user) => user.boards)
+    @JoinColumn([{ name : 'userId', referencedColumnName: 'userId' }])
     user : User
 
     @OneToMany(() => Members, (members) => members.boardId)

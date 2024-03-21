@@ -13,11 +13,11 @@ export class Members {
     @Column({ type: 'bigint', name : 'userId', nullable : false})
     userId : number
 
-    @Column({ type: 'bigint', name : 'boardId', nullable : false })
+    @Column({ type: 'bigint', name : 'boardId' })
     boardId : number
 
-    @ManyToOne(() => Boards, (boards) => boards.boardId)
-    @JoinColumn({ name : 'boardId' })
+    @ManyToOne(() => Boards, (boards) => boards.boardId, { onDelete : "CASCADE" })
+    @JoinColumn({ name : 'boardId', referencedColumnName: 'boardId'})
     boards: Boards
 
     @ManyToOne(() => User, (users) => users.userId)
@@ -28,6 +28,6 @@ export class Members {
     role : Role
 
     // 인증 번호 컬럼인데 어디다 둬야 최선인지 모르겠어서 일단 멤버에다 추가
-    @Column({ type : 'bigint', select : false })
+    @Column({ type : 'int', select : false })
     verificationToken : number
 }
