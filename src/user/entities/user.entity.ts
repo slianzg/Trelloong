@@ -1,29 +1,32 @@
-import {
-  Column,
-  DeleteDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Board } from "src/board/entities/board.entity";
+import { Member } from "src/member/entities/member.entity";
+import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
-  name: 'users',
-})
+    name: 'user',
+  })
 export class User {
-  @PrimaryGeneratedColumn()
-  userId: number;
+    @PrimaryGeneratedColumn()
+    userId : number
 
-  @Column({ type: 'varchar', unique: true, nullable: false })
-  email: string;
+    @OneToMany(() => Board, (board) => board.user)
+    board : Board[]
 
-  @Column({ type: 'varchar', select: false, nullable: false })
-  password: string;
+    @OneToMany(() => Member, (member) => member.userId)
+    member : Member[]
 
-  @Column({ type: 'varchar', nullable: false })
-  userName: string;
+    @Column({ type: 'varchar', unique : true,  nullable : false })
+    email : string
 
-  @Column({ type: 'varchar', nullable: true })
-  contact?: string;
+    @Column({ type: 'varchar', select : false, nullable : false })
+    password : string
 
-  @DeleteDateColumn({ type: 'timestamp', select: false, nullable: true })
-  deletedAt?: Date;
+    @Column({ type: 'varchar', nullable : false })
+    userName : string
+
+    @Column({ type: 'varchar', nullable : true })
+    contact? : string
+
+    @DeleteDateColumn({ type: 'timestamp', select : false, nullable : true })
+    deletedAt? : Date
 }
