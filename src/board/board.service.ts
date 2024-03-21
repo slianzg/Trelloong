@@ -28,13 +28,13 @@ export class BoardService {
     // 보드 생성
     async createBoard (createBoardDto : CreateBoardDto, userId : number) {
         const boardInfo = await this.boardRepository.save({
-            boardName : createBoardDto.name,
-            boardDescription : createBoardDto.description,
-            boardColor : createBoardDto.color,
+            boardName : createBoardDto.boardName,
+            boardDescription : createBoardDto.boardDescription,
+            boardColor : createBoardDto.boardColor,
             user : { userId }   // 왜 userId,boardId까지 끌고오는 거지..?
         })
     await this.memberRepository.save({
-        userId : userId,
+        userId,
         boardId : boardInfo.boardId,
         role : Role.Admin
     })
@@ -43,6 +43,7 @@ export class BoardService {
 
     // 보드 수정
     async updatedBoard (boardId : number, updatedBoardDto : UpdatedBoardDto, userId : number) {
+        const { boardName, boardDescription, boardColor } = updatedBoardDto
         // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
         const boardMember = await this.memberRepository.findOne({
             where : { userId, boardId }
@@ -71,7 +72,7 @@ export class BoardService {
             throw new NotAcceptableException ('어드민인 보드만 수정이 가능합니다.')
         }
         // 3칸 다 비어 있을 경우
-        if (!updatedBoardDto.boardName && !updatedBoardDto.boardDescription && !updatedBoardDto.boardColor) {
+        if (!boardName && !boardDescription && !boardColor) {
             throw new BadRequestException ('수정사항이 없습니다.')
         }
 
@@ -175,13 +176,9 @@ export class BoardService {
     await this.memberRepository.save({
         userId : inviteUser.userId,
         boardId : boardId,
-        // email : inviteUser.email,
         role : Role.User,   // 초대 대기 상태
         verificationToken : token
     })
-    // await this.userRepository.save({
-    //     email : inviteUser.email
-    // })
     await this.sendEmailService.sendInvitationEmail(inviteUser.email, token)
     }
 
