@@ -33,14 +33,15 @@ export class BoardController {
   }
 
   // 인증 확인
-  @Patch('/verify')
+  @Patch('verify')
   async confirmToken (@Body() authConfirmDto : AuthConfirmDto, @Req() req) {
     const { userId } = req.user
     await this.boardService.confirmToken(authConfirmDto, userId)
+    return { message : "인증이 완료 되었습니다." }
   }
 
   // 보드 수정
-  @Patch(':boardId')
+  @Patch('update/:boardId')
   async updatedBoard(
     @Param('boardId') boardId: number,
     @Body() updatedBoardDto: UpdatedBoardDto, @Req() req) {
@@ -52,7 +53,7 @@ export class BoardController {
   // 보드 삭제
   // @UseGuards(RolesGuard)
   // @Roles(Role.Admin)
-  @Delete(':boardId')
+  @Delete('delete/:boardId')
   async deleteBoard(
     @UserInfo() user : User,
     @Param('boardId') boardId: number,
@@ -63,16 +64,17 @@ export class BoardController {
   }
 
   // 보드 목록
-  @Get()
-  async boardList() {
-    const boardListUp = await this.boardService.boardList();
+  @Get('list')
+  async boardList(@Req() req) {
+    const { userId } = req.user
+    const boardListUp = await this.boardService.boardList(userId);
     return { boardListUp };
   }
 
   // 멤버 초대
   // @UseGuards(RolesGuard)
   // @Roles(Role.Admin)
-  @Post(':boardId')
+  @Post('invite/:boardId')
   async inviteMember (@Param('boardId') boardId : number, @Body() inviteBoardDto : InviteBoardDto, @Req() req) {
     const { userId } = req.user
     await this.boardService.inviteMember(boardId, inviteBoardDto, userId)

@@ -44,6 +44,12 @@ export class BoardService {
     // 보드 수정
     async updatedBoard (boardId : number, updatedBoardDto : UpdatedBoardDto, userId : number) {
         const { boardName, boardDescription, boardColor } = updatedBoardDto
+
+        // 3칸 다 비어 있을 경우
+        if (!boardName && !boardDescription && !boardColor) {
+            throw new BadRequestException ('수정사항이 없습니다.')
+        }
+
         // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
         const boardMember = await this.memberRepository.findOne({
             where : { userId, boardId }
@@ -71,15 +77,11 @@ export class BoardService {
         if (!findAminBoard) {
             throw new NotAcceptableException ('어드민인 보드만 수정이 가능합니다.')
         }
-        // 3칸 다 비어 있을 경우
-        if (!boardName && !boardDescription && !boardColor) {
-            throw new BadRequestException ('수정사항이 없습니다.')
-        }
 
         await this.boardRepository.update(boardId,{
-            boardName : updatedBoardDto.boardName,
-            boardDescription : updatedBoardDto.boardDescription,
-            boardColor : updatedBoardDto.boardColor
+            boardName,
+            boardDescription,
+            boardColor
         })
     }
 
@@ -125,8 +127,11 @@ export class BoardService {
     }
 
     // 보드 목록
-    async boardList () {
+    async boardList (userId : number) {
     const boardListUp = await this.boardRepository.find({
+        where : {
+            userId
+        },
         select : {
             boardId : true,
             boardName : true,
@@ -148,7 +153,7 @@ export class BoardService {
         // 본인이 어드민인 보드에 초대하는 것이 맞는지 확인
         const findOneBoard = await this.memberRepository.findOne({
             where : {
-                boardId : boardId,
+                boardId,
                 userId : userId,
                 role : Role.Admin
             }
@@ -199,7 +204,7 @@ export class BoardService {
             throw new ConflictException ('존재 하지 않는 이메일이거나 본인만 인증이 가능합니다.')
         }
 
-        const member = await this.memberRepository.find({
+        const member = await this.memberRepository.findOne({
             where : {
                 userId : halfMember.userId,
                 verificationToken : authConfirmDto.verificationToken
@@ -209,7 +214,7 @@ export class BoardService {
         if (!member) {
             throw new ConflictException ('인증번호가 일치하지 않습니다.')
         }
-        await this.memberRepository.update(member[0].memberId,{
+        await this.memberRepository.update(member.memberId,{
             role : Role.Member
         })
     }

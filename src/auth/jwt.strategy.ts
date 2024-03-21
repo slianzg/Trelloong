@@ -35,7 +35,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (_.isNil(user)) {
       throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
     }
-    console.log(user)
     return user;
   }
 }

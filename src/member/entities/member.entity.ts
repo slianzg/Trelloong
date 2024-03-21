@@ -13,7 +13,7 @@ export class Member {
     @Column({ type: 'bigint', name : 'userId', nullable : false})
     userId : number
 
-    @Column({ type: 'bigint', name : 'boardId' })
+    @Column({ type: 'bigint', name : 'boardId', nullable : false})
     boardId : number
 
     @ManyToOne(() => Board, (board) => board.boardId, { onDelete : "CASCADE" })
