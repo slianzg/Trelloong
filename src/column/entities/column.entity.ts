@@ -17,7 +17,7 @@ export class Columns {
     @Column ({type : 'bigint', name : 'boardId', nullable : false})
     boardId : number
 
-    @ManyToOne(() => Board, (boards) => boards.columns)
+    @ManyToOne(() => Board, (board) => board.column)
     @JoinColumn({ name : 'boardId' })
-    boards : Board
+    board : Board
 }

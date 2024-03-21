@@ -1,5 +1,5 @@
-import { Boards } from "src/board/entities/board.entity";
-import { Members } from "src/member/entities/member.entity";
+import { Board } from "src/board/entities/board.entity";
+import { Member } from "src/member/entities/member.entity";
 import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
@@ -9,11 +9,11 @@ export class User {
     @PrimaryGeneratedColumn()
     userId : number
 
-    @OneToMany(() => Boards, (board) => board.user)
-    boards : Boards[]
+    @OneToMany(() => Board, (board) => board.user)
+    board : Board[]
 
-    @OneToMany(() => Members, (members) => members.userId)
-    members : Members[]
+    @OneToMany(() => Member, (members) => members.userId)
+    member : Member[]
 
     @Column({ type: 'varchar', unique : true,  nullable : false })
     email : string

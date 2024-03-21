@@ -13,15 +13,15 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGene
     @Column({ type: 'bigint', name : 'userId', nullable : false })
     userId : number
 
-    @ManyToOne(() => User, (user) => user.boards)
+    @ManyToOne(() => User, (user) => user.board)
     @JoinColumn([{ name : 'userId', referencedColumnName: 'userId' }])
     user : User
 
     @OneToMany(() => Member, (members) => members.boardId)
-    members: Member[]
+    member: Member[]
 
     @OneToMany(() => Columns, (columns) => columns.boardId)
-    columns: Columns[]
+    column: Columns[]
 
     @Column({ type: 'varchar', nullable: false })
     boardName : string
