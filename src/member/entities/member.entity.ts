@@ -24,7 +24,7 @@ export class Members {
     @JoinColumn({ name : 'userId' })
     users : User
 
-    @Column({ type: 'enum', nullable: false })
+    @Column({ type: 'enum', enum : Role, nullable: false })
     role : Role
 
     // 인증 번호 컬럼인데 어디다 둬야 최선인지 모르겠어서 일단 멤버에다 추가

@@ -5,6 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardService } from './board.service';
 import { BoardController } from './board.controller';
 import { Boards } from './entities/board.entity';
+import { Members } from 'src/member/entities/member.entity';
+import { User } from 'src/user/entities/user.entity';
+import { SendEmailService } from 'src/utils/sendEmail.service';
 
 @Module({
     imports: [
@@ -14,9 +17,9 @@ import { Boards } from './entities/board.entity';
         }),
         inject: [ConfigService],
       }),
-      TypeOrmModule.forFeature([Boards]),
+      TypeOrmModule.forFeature([Boards, User, Members]),
     ],
-    providers: [BoardService],
+    providers: [BoardService, SendEmailService],
     controllers: [BoardController],
     exports: [BoardService],
   })
