@@ -3,7 +3,6 @@ import { SendEmailService } from "./sendEmail.service";
 
 
 @Module({
-    controllers: [SendEmailService],
     providers: [SendEmailService],
     exports: [SendEmailService],
   })

@@ -12,7 +12,7 @@ export class User {
     @OneToMany(() => Board, (board) => board.user)
     board : Board[]
 
-    @OneToMany(() => Member, (members) => members.userId)
+    @OneToMany(() => Member, (member) => member.userId)
     member : Member[]
 
     @Column({ type: 'varchar', unique : true,  nullable : false })
