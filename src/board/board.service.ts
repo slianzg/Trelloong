@@ -186,25 +186,28 @@ export class BoardService {
     }
 
     // 인증 확인
-    async confirmToken (authConfirmDto : AuthConfirmDto) {
+    async confirmToken (authConfirmDto : AuthConfirmDto, userId : number) {
         const halfMember = await this.userRepository.findOne({
             where : {
-                email : authConfirmDto.email
+                email : authConfirmDto.email,
+                userId
             },
             select : {
                 userId : true,
             }
         })
+
+        if (!halfMember) {
+            throw new ConflictException ('존재 하지 않는 이메일이거나 본인만 인증이 가능합니다.')
+        }
+
         const member = await this.memberRepository.find({
             where : {
                 userId : halfMember.userId,
                 verificationToken : authConfirmDto.verificationToken
             }
         })
-        //console.log(member,"---------------------",authConfirmDto.verificationToken)
-        if (!halfMember) {
-            throw new ConflictException ('존재 하지 않는 이메일 입니다.')
-        }
+        
         if (!member) {
             throw new ConflictException ('인증번호가 일치하지 않습니다.')
         }

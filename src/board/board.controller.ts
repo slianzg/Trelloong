@@ -37,9 +37,11 @@ export class BoardController {
 
   // 인증 확인
   @Patch('/verify')
-  async confirmToken (@Body() authConfirmDto : AuthConfirmDto) {
-    await this.boardService.confirmToken(authConfirmDto)
+  async confirmToken (@Body() authConfirmDto : AuthConfirmDto, @Req() req) {
+    const { userId } = req.user
+    await this.boardService.confirmToken(authConfirmDto, userId)
   }
+
 
   // 보드 수정
   @Patch(':boardId')

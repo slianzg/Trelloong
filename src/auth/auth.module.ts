@@ -7,7 +7,7 @@ import { BoardModule } from "src/board/board.module";
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt', session: false }),
-    UserModule,BoardModule
+    UserModule
   ],
   providers: [JwtStrategy],
 })
