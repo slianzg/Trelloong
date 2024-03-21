@@ -1,10 +1,9 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
 import { Request as RequestType } from 'express';
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PassportStrategy } from "@nestjs/passport";
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { MemberService } from "src/member/member.service";
 import _ from 'lodash';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -19,6 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: process.env.JWT_SECRET_KEY,
     });
   }
+
   private static extractJWT(req: RequestType): string | null {
     const { authorization } = req.cookies;
     if (authorization) {
@@ -29,11 +29,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
     return null;
   }
+
   async validate(payload: any) {
-    const user = await this.userService.findUserEmail(payload.email);
+    const user = await this.userService.findByEmail(payload.email);
     if (_.isNil(user)) {
-      throw new NotFoundException('해당하는 사용자를 찾을 수 없습니다.');
+      throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
     }
-    return  user 
+    return user;
   }
 }
