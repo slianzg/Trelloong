@@ -7,3 +7,4 @@ import { MemberController } from './member.controller';
   providers: [MemberService],
 })
 export class MemberModule {}
+ 
