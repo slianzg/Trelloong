@@ -3,7 +3,7 @@ import { Member } from "src/member/entities/member.entity";
 import { Column, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
-    name: 'user',
+    name: 'users',
   })
 export class User {
     @PrimaryGeneratedColumn()
