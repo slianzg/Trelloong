@@ -4,8 +4,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardService } from './board.service';
 import { BoardController } from './board.controller';
-import { Boards } from './entities/board.entity';
-import { Members } from 'src/member/entities/member.entity';
+import { Board } from './entities/board.entity';
+import { Member } from 'src/member/entities/member.entity';
 import { User } from 'src/user/entities/user.entity';
 import { SendEmailService } from 'src/utils/sendEmail.service';
 
@@ -17,7 +17,7 @@ import { SendEmailService } from 'src/utils/sendEmail.service';
         }),
         inject: [ConfigService],
       }),
-      TypeOrmModule.forFeature([Boards, User, Members]),
+      TypeOrmModule.forFeature([Board, User, Member]),
     ],
     providers: [BoardService, SendEmailService],
     controllers: [BoardController],

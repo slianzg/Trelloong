@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ColumnsController } from './columns.controller';
-import { ColumnsService } from './columns.service';
+import { ColumnsController } from '../column/columns.controller';
+import { ColumnsService } from '../column/columns.service';
 
 describe('ColumnsController', () => {
   let controller: ColumnsController;

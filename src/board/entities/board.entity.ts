@@ -1,12 +1,12 @@
-import { Columns } from "src/columns/entities/column.entity";
-import { Members } from "src/member/entities/member.entity";
+import { Columns } from "src/column/entities/column.entity";
+import { Member } from "src/member/entities/member.entity";
 import { User } from "src/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
     name: 'boards',
   })
-  export class Boards {
+  export class Board {
     @PrimaryGeneratedColumn()
     boardId: number
 
@@ -17,8 +17,8 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGene
     @JoinColumn([{ name : 'userId', referencedColumnName: 'userId' }])
     user : User
 
-    @OneToMany(() => Members, (members) => members.boardId)
-    members: Members[]
+    @OneToMany(() => Member, (members) => members.boardId)
+    members: Member[]
 
     @OneToMany(() => Columns, (columns) => columns.boardId)
     columns: Columns[]

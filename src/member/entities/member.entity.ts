@@ -1,4 +1,4 @@
-import { Boards } from "src/board/entities/board.entity";
+import { Board } from "src/board/entities/board.entity";
 import { Role } from "src/types/role.type";
 import { User } from "src/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
@@ -6,7 +6,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColum
 @Entity({
     name: 'members',
   })
-export class Members {
+export class Member {
     @PrimaryGeneratedColumn()
     memberId : number
 
@@ -16,9 +16,9 @@ export class Members {
     @Column({ type: 'bigint', name : 'boardId' })
     boardId : number
 
-    @ManyToOne(() => Boards, (boards) => boards.boardId, { onDelete : "CASCADE" })
+    @ManyToOne(() => Board, (boards) => boards.boardId, { onDelete : "CASCADE" })
     @JoinColumn({ name : 'boardId', referencedColumnName: 'boardId'})
-    boards: Boards
+    boards: Board
 
     @ManyToOne(() => User, (users) => users.userId)
     @JoinColumn({ name : 'userId' })

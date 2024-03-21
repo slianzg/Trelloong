@@ -1,10 +1,10 @@
 import { BadRequestException, ConflictException, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { Boards } from './entities/board.entity';
+import { Board } from './entities/board.entity';
 import { CreateBoardDto } from './dto/createBoard.dto';
 import { UpdatedBoardDto } from './dto/updatedBoard.dto';
-import { Members } from 'src/member/entities/member.entity';
+import { Member } from 'src/member/entities/member.entity';
 import { DeleteBoardDto } from './dto/deleteBoard.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
@@ -16,12 +16,12 @@ import { AuthConfirmDto } from './dto/authConfirm.dto';
 @Injectable()
 export class BoardService {
     constructor (
-        @InjectRepository(Boards)
-        private boardRepository : Repository<Boards>,
+        @InjectRepository(Board)
+        private boardRepository : Repository<Board>,
         @InjectRepository(User)
         private userRepository : Repository<User>,
-        @InjectRepository(Members)
-        private memberRepository : Repository<Members>,
+        @InjectRepository(Member)
+        private memberRepository : Repository<Member>,
         private sendEmailService : SendEmailService
         ) {}
     
@@ -194,6 +194,7 @@ export class BoardService {
             }
         })
 
+        // 대리 인증 방지
         if (!halfMember) {
             throw new ConflictException ('존재 하지 않는 이메일이거나 본인만 인증이 가능합니다.')
         }

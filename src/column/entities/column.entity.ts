@@ -1,4 +1,4 @@
-import { Boards } from "src/board/entities/board.entity";
+import { Board } from "src/board/entities/board.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
@@ -17,7 +17,7 @@ export class Columns {
     @Column ({type : 'bigint', name : 'boardId', nullable : false})
     boardId : number
 
-    @ManyToOne(() => Boards, (boards) => boards.columns)
+    @ManyToOne(() => Board, (boards) => boards.columns)
     @JoinColumn({ name : 'boardId' })
-    boards : Boards
+    boards : Board
 }

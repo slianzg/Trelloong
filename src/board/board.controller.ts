@@ -11,9 +11,6 @@ import {
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/createBoard.dto';
-import { Role } from 'src/types/role.type';
-import { Roles } from 'src/auth/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
 import { UpdatedBoardDto } from './dto/updatedBoard.dto';
 import { UserInfo } from 'src/utils/custom-decorator.ts/userInfo.decorator';
 import { DeleteBoardDto } from './dto/deleteBoard.dto';
@@ -30,7 +27,7 @@ export class BoardController {
   // 보드 생성
   @Post('create')
   async createBoard(@Body() createBoardDto: CreateBoardDto, @Req() req) {
-    const { userId } = req.user
+    const { userId } = req.user 
     const boardInfo = await this.boardService.createBoard(createBoardDto, userId);
     return { message: '보드 생성이 완료되었습니다.', boardInfo };
   }
@@ -41,7 +38,6 @@ export class BoardController {
     const { userId } = req.user
     await this.boardService.confirmToken(authConfirmDto, userId)
   }
-
 
   // 보드 수정
   @Patch(':boardId')
