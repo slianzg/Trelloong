@@ -51,8 +51,6 @@ export class BoardController {
   }
 
   // 보드 삭제
-  // @UseGuards(RolesGuard)
-  // @Roles(Role.Admin)
   @Delete('delete/:boardId')
   async deleteBoard(
     @UserInfo() user : User,
@@ -72,8 +70,6 @@ export class BoardController {
   }
 
   // 멤버 초대
-  // @UseGuards(RolesGuard)
-  // @Roles(Role.Admin)
   @Post('invite/:boardId')
   async inviteMember (@Param('boardId') boardId : number, @Body() inviteBoardDto : InviteBoardDto, @Req() req) {
     const { userId } = req.user

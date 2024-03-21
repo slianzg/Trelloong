@@ -27,7 +27,6 @@ export class Member {
     @Column({ type: 'enum', enum : Role, nullable: false })
     role : Role
 
-    // 인증 번호 컬럼인데 어디다 둬야 최선인지 모르겠어서 일단 멤버에다 추가
     @Column({ type : 'int', select : false })
     verificationToken : number
 }
