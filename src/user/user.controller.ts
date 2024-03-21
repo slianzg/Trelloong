@@ -67,7 +67,7 @@ export class UserController {
   @Delete('myPage/withdraw')
   async withdraw(@Req() req, @Body() deleteUserDto: DeleteUserDto, @Res() res) {
     const { userId } = req.user;
-    await this.userService.withdraw(userId, deleteUserDto);
-    res.send('회원 탈퇴되었습니다.');
+    const deletedUser = await this.userService.withdraw(userId, deleteUserDto);
+    return res.status(deletedUser.status).send(`${deletedUser.message}`);
   }
 }
