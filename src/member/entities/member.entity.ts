@@ -33,6 +33,6 @@ export class Member {
   @Column({ type: 'enum', enum: Role, nullable: false })
   role: Role;
 
-  @Column({ type: 'int', select: false })
+  @Column({ type: 'int', select: false, nullable: true })
   verificationToken: number;
 }
