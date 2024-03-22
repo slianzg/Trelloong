@@ -48,6 +48,37 @@ export class ColumnsService {
     });
   }
 
+  async updateColumnOrder(columnId: number, newOrder: number) {
+
+    const columnToUpdate = await this.columnsRepository.findOneBy({ columnId });
+    if (!columnToUpdate) {
+      throw new Error('해당컬럼이 없습니다');
+    }
+    const previousOrder = columnToUpdate.columnOrder;
+    const boardId = columnToUpdate.boardId;
+  
+    const columns = await this.columnsRepository.find({ where: { boardId } });
+  
+
+    columns.forEach(column => {
+      if (newOrder > previousOrder) {
+        if (column.columnOrder > previousOrder && column.columnOrder <= newOrder) {
+          column.columnOrder -= 1;
+        }
+      } else if (newOrder < previousOrder) {
+        if (column.columnOrder < previousOrder && column.columnOrder >= newOrder) {
+          column.columnOrder += 1;
+        }
+      }
+    });
+
+    columnToUpdate.columnOrder = newOrder;
+
+    await Promise.all(columns.map(column => this.columnsRepository.save(column)));
+  }
+
+  
+ 
 
 
 
