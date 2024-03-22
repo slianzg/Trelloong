@@ -20,7 +20,7 @@ import { User } from 'src/user/entities/user.entity';
 import { AuthConfirmDto } from './dto/authConfirm.dto';
 
 @UseGuards(AuthGuard('jwt'))
-@Controller('boards')
+@Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
@@ -66,7 +66,7 @@ export class BoardController {
   async boardList(@Req() req) {
     const { userId } = req.user
     const boardListUp = await this.boardService.boardList(userId);
-    return { boardListUp };
+    return boardListUp;
   }
 
   // 멤버 초대

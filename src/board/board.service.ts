@@ -138,7 +138,7 @@ export class BoardService {
             boardDescription : true
         } 
     })
-    return { boardListUp }
+    return boardListUp
     }
 
     // 멤버 초대
