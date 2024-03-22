@@ -69,7 +69,7 @@ export class ColumnsService {
     }
   return columns
 }
-
+//1
   async update(boardId:number,columnId: number, columnName:string) {
 
     const column = await this.columnsRepository.findOne({
