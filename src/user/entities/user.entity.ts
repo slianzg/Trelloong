@@ -1,7 +1,10 @@
+import { Board } from 'src/board/entities/board.entity';
+import { Member } from 'src/member/entities/member.entity';
 import {
   Column,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -11,6 +14,12 @@ import {
 export class User {
   @PrimaryGeneratedColumn()
   userId: number;
+
+  @OneToMany(() => Board, (board) => board.user)
+  board: Board[];
+
+  @OneToMany(() => Member, (member) => member.userId)
+  member: Member[];
 
   @Column({ type: 'varchar', unique: true, nullable: false })
   email: string;
