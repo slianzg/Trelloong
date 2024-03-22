@@ -191,6 +191,7 @@ export class BoardService {
         '어드민인 보드만 멤버 초대가 가능합니다.',
       );
     }
+    // 초대할 유저 유무 확인
     const inviteUser = await this.userRepository.findOne({
       where: {
         email: inviteBoardDto.email,
@@ -203,19 +204,32 @@ export class BoardService {
     if (!inviteUser) {
       throw new NotFoundException('초대하려는 유저가 존재하지 않습니다.');
     }
-
+    // 초대할 유저가 해당 보드에 요청 받았던 전적이 있는지 확인
+    const savedMember = await this.memberRepository.findOne({
+      where : {
+        boardId,
+        userId : inviteUser.userId
+      }
+    })
+    if (savedMember) {
+      throw new NotAcceptableException ('같은 사용자에게 여러번 초대를 보낼 수 없습니다.')
+    }
+    if (!savedMember) {
     const randomNum = () => {
       // 랜덤한 숫자로 구성된 토큰 생성
       return Math.floor(1000 + Math.random() * 9000);
     };
     const token = randomNum();
+    
     await this.memberRepository.save({
       userId: inviteUser.userId,
       boardId: boardId,
       role: Role.User, // 초대 대기 상태
       verificationToken: token,
     });
+    
     await this.sendEmailService.sendInvitationEmail(inviteUser.email, token);
+  }
   }
 
   // 인증 확인
