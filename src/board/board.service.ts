@@ -31,7 +31,7 @@ export class BoardService {
             boardName : createBoardDto.boardName,
             boardDescription : createBoardDto.boardDescription,
             boardColor : createBoardDto.boardColor,
-            user : { userId }   // 왜 userId,boardId까지 끌고오는 거지..?
+            userId
         })
     await this.memberRepository.save({
         userId,
