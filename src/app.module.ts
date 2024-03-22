@@ -4,19 +4,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { MemberModule } from './member/member.module';
 import { BoardModule } from './board/board.module';
-import { ColumnModule } from './column/column.module';
 import { CardModule } from './card/card.module';
 import { CommentModule } from './comment/comment.module';
-import { GroupModule } from './group/group.module';
 import Joi from 'joi';
-import { Member } from './member/entities/member.entity';
-import { Boards } from './board/entities/board.entity';
-import { Columns } from './column/entities/column.entity';
 import { Card } from './card/entities/card.entity';
-import { Group } from './group/entities/group.entity';
 import { Comment } from './comment/entities/comment.entity';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
+import { Board } from './board/entities/board.entity';
+import { Member } from './member/entities/member.entity';
+
+import { Columns } from './column/entities/column.entity';
+import { ColumnModule } from './column/column.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -29,7 +29,7 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [Member, Boards, Columns, Card, Comment, Group],
+    entities: [User, Member, Board, Columns, Card, Comment],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -37,8 +37,29 @@ const typeOrmModuleOptions = {
 };
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        JWT_SECRET_KEY: Joi.string().required(),
+        DB_USERNAME: Joi.string().required(),
+        DB_PASSWORD: Joi.string().required(),
+        DB_HOST: Joi.string().required(),
+        DB_PORT: Joi.number().required(),
+        DB_NAME: Joi.string().required(),
+        DB_SYNC: Joi.boolean().required(),
+      }),
+    }),
+    TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    AuthModule,
+    MemberModule,
+    BoardModule,
+    ColumnModule,
+    CardModule,
+    CommentModule,
+    UserModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
