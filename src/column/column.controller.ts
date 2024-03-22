@@ -51,4 +51,4 @@ export class ColumnsController {
     await this.columnsService.remove(+boardId, +columnId);
     return { message: '삭제 되었습니다' };
   }
-}f
+}
