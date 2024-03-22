@@ -4,7 +4,7 @@ export class UpdateColumnDto  {
 
 
     @IsString()
-    columName: string;
+    columnName: string;
 
     
 }
