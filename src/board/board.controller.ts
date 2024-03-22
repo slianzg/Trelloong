@@ -27,33 +27,38 @@ export class BoardController {
   // 보드 생성
   @Post('create')
   async createBoard(@Body() createBoardDto: CreateBoardDto, @Req() req) {
-    const { userId } = req.user 
-    const boardInfo = await this.boardService.createBoard(createBoardDto, userId);
+    const { userId } = req.user;
+    const boardInfo = await this.boardService.createBoard(
+      createBoardDto,
+      userId,
+    );
     return { message: '보드 생성이 완료되었습니다.', boardInfo };
   }
 
   // 인증 확인
   @Patch('verify')
-  async confirmToken (@Body() authConfirmDto : AuthConfirmDto, @Req() req) {
-    const { userId } = req.user
-    await this.boardService.confirmToken(authConfirmDto, userId)
-    return { message : "인증이 완료 되었습니다." }
+  async confirmToken(@Body() authConfirmDto: AuthConfirmDto, @Req() req) {
+    const { userId } = req.user;
+    await this.boardService.confirmToken(authConfirmDto, userId);
+    return { message: '인증이 완료 되었습니다.' };
   }
 
   // 보드 수정
   @Patch('update/:boardId')
   async updatedBoard(
     @Param('boardId') boardId: number,
-    @Body() updatedBoardDto: UpdatedBoardDto, @Req() req) {
-    const { userId } = req.user
+    @Body() updatedBoardDto: UpdatedBoardDto,
+    @Req() req,
+  ) {
+    const { userId } = req.user;
     await this.boardService.updatedBoard(boardId, updatedBoardDto, userId);
-    return { message: '보드 수정이 완료되었습니다.'};
+    return { message: '보드 수정이 완료되었습니다.' };
   }
 
   // 보드 삭제
   @Delete('delete/:boardId')
   async deleteBoard(
-    @UserInfo() user : User,
+    @UserInfo() user: User,
     @Param('boardId') boardId: number,
     @Body() deleteBoardDto: DeleteBoardDto,
   ) {
@@ -64,17 +69,19 @@ export class BoardController {
   // 보드 목록
   @Get('list')
   async boardList(@Req() req) {
-    const { userId } = req.user
+    const { userId } = req.user;
     const boardListUp = await this.boardService.boardList(userId);
     return boardListUp;
   }
 
   // 멤버 초대
   @Post('invite/:boardId')
-  async inviteMember (@Param('boardId') boardId : number, @Body() inviteBoardDto : InviteBoardDto, @Req() req) {
-    const { userId } = req.user
-    await this.boardService.inviteMember(boardId, inviteBoardDto, userId)
+  async inviteMember(
+    @Param('boardId') boardId: number,
+    @Body() inviteBoardDto: InviteBoardDto,
+    @Req() req,
+  ) {
+    const { userId } = req.user;
+    await this.boardService.inviteMember(boardId, inviteBoardDto, userId);
   }
-
-  
 }
