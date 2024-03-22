@@ -20,8 +20,8 @@ export class Member {
     @JoinColumn({ name : 'boardId', referencedColumnName: 'boardId'})
     board: Board
 
-    @ManyToOne(() => User, (user) => user.userId)
-    @JoinColumn({ name : 'userId' })
+    @ManyToOne(() => User, (users) => users.userId)
+    @JoinColumn({ name : 'userId', referencedColumnName: 'userId' })
     user : User
 
     @Column({ type: 'enum', enum : Role, nullable: false })
