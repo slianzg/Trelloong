@@ -147,7 +147,7 @@ export class CardService {
       await this.cardRepository
         .createQueryBuilder()
         .update(Card)
-        .set({ cardOrder: cardOrder })
+        .set({ cardOrder: cardOrder, columnId: columnId })
         .where('cardId = cardID', { cardId })
         .execute();
     }
