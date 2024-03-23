@@ -14,8 +14,9 @@ import { User } from './user/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { Board } from './board/entities/board.entity';
 import { Member } from './member/entities/member.entity';
-import { ColumnsModule } from './column/columns.module';
+
 import { Columns } from './column/entities/column.entity';
+import { ColumnModule } from './column/column.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -53,7 +54,7 @@ const typeOrmModuleOptions = {
     AuthModule,
     MemberModule,
     BoardModule,
-    ColumnsModule,
+    ColumnModule,
     CardModule,
     CommentModule,
     UserModule,

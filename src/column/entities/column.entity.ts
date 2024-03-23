@@ -1,3 +1,4 @@
+
 import { Board } from "src/board/entities/board.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 

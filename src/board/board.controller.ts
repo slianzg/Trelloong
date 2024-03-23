@@ -85,3 +85,4 @@ export class BoardController {
     await this.boardService.inviteMember(boardId, inviteBoardDto, userId);
   }
 }
+
