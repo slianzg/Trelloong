@@ -19,9 +19,8 @@ import { InviteBoardDto } from './dto/inviteBoard.dto';
 import { User } from 'src/user/entities/user.entity';
 import { AuthConfirmDto } from './dto/authConfirm.dto';
 import { MemberGuard } from 'src/auth/member.guard';
-import { Role } from 'src/types/role.type';
 import { Roles } from 'src/auth/roles.decorator';
-
+import { Role } from 'src/types/role.type';
 
 @Controller('board')
 export class BoardController {
@@ -97,4 +96,3 @@ export class BoardController {
     await this.boardService.inviteMember(boardId, inviteBoardDto, userId);
   }
 }
-

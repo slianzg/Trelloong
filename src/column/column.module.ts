@@ -8,9 +8,11 @@ import { UserModule } from 'src/user/user.module';
 import { MemberModule } from 'src/member/member.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Board, Columns]),
-  UserModule,
-  MemberModule],
+  imports: [
+    TypeOrmModule.forFeature([Board, Columns]),
+    UserModule,
+    MemberModule,
+  ],
   providers: [ColumnsService],
   controllers: [ColumnsController],
   exports: [ColumnsService],
