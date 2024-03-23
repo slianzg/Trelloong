@@ -29,7 +29,6 @@ export class MemberGuard extends AuthGuard('jwt') implements CanActivate {
     if (!member || member.role === Role.User) {
       return false;
     }
-    console.log(member.role)
     return true;
   }
 }

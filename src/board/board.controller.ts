@@ -16,8 +16,9 @@ import { DeleteBoardDto } from './dto/deleteBoard.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { InviteBoardDto } from './dto/inviteBoard.dto';
 import { AuthConfirmDto } from './dto/authConfirm.dto';
-import { MemberGuard } from 'src/auth/member.guard';
 import { AdminGuard } from 'src/auth/admin.guard';
+import { UserInfo } from 'src/utils/custom-decorator.ts/userInfo.decorator';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('board')
 export class BoardController {
@@ -45,7 +46,6 @@ export class BoardController {
   }
 
   // 보드 수정
-  @UseGuards(MemberGuard)
   @UseGuards(AdminGuard)
   @Patch('update/:boardId')
   async updatedBoard(
@@ -59,17 +59,14 @@ export class BoardController {
   }
 
   // 보드 삭제
-  @UseGuards(MemberGuard)
   @UseGuards(AdminGuard)
   @Delete('delete/:boardId')
   async deleteBoard(
-    //@UserInfo() user: User,
-    @Req() req,
+    @UserInfo() user: User,
     @Param('boardId') boardId: number,
     @Body() deleteBoardDto: DeleteBoardDto,
   ) {
-    const { userId } = req.user
-    await this.boardService.deleteBoard(userId, boardId, deleteBoardDto);
+    await this.boardService.deleteBoard(user, boardId, deleteBoardDto);
     return { message: '보드 삭제가 완료되었습니다.' };
   }
 
@@ -83,7 +80,6 @@ export class BoardController {
   }
 
   // 멤버 초대
-  @UseGuards(MemberGuard)
   @UseGuards(AdminGuard)
   @Post('invite/:boardId')
   async inviteMember(
