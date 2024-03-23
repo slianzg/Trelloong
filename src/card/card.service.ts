@@ -48,6 +48,7 @@ export class CardService {
     if (_.isNil(card)) {
       throw new NotFoundException('해당 카드를 찾을 수 없습니다.');
     }
+    return card;
   }
 
   async cardUpdate(
@@ -88,8 +89,24 @@ export class CardService {
   }
 
   async delete(columnId: number, cardId: number) {
-    this.findOne(columnId, cardId);
+    const deletedCard = await this.findOne(columnId, cardId);
+    if (!deletedCard) {
+      throw new NotFoundException('해당 카드를 찾을 수 없습니다');
+    }
+
+    const deleteCardOrder = deletedCard.cardOrder;
+
     await this.cardRepository.delete({ columnId, cardId });
+
+    await this.cardRepository
+      .createQueryBuilder()
+      .update(Card)
+      .set({ cardOrder: () => 'cardOrder-1' })
+      .where('columnId = :columnId AND cardOrder > :deleteCardOrder', {
+        columnId: deletedCard.columnId,
+        deleteCardOrder,
+      })
+      .execute();
   }
 
   async updateCardOrder(cardId: number, columnId: number, cardOrder: number) {
