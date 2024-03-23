@@ -36,7 +36,7 @@ export class ColumnsController {
   async update (@Param('boardId') boardId: number,
           @Param('columnId') columnId:number, @Body() updateColumnDto: UpdateColumnDto) {
      await this.columnsService.update(+boardId, +columnId, updateColumnDto.columnName);
-     return { message: '수정되엇습니다' };
+     return { message: '수정되었습니다' };
   }
 
   @Patch('move/:columnId')

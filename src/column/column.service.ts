@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateColumnDto } from './dto/create-column.dto';
-import { UpdateColumnDto } from './dto/update-column.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Columns } from './entities/column.entity';
 import { Repository } from 'typeorm';
 import _ from 'lodash';
-import { Member } from 'src/member/entities/member.entity';
+
 
 
 @Injectable()
@@ -13,8 +12,6 @@ export class ColumnsService {
     constructor(
         @InjectRepository(Columns)
         private readonly columnsRepository: Repository<Columns>,
-        // @InjectRepository(Member)
-        // private memberRepository: Repository<Member>
       ) {}
 
 
@@ -60,7 +57,6 @@ export class ColumnsService {
     
       return columns;
     }
-
 
   async findOne(boardId:number, columnId: number) {
     const columns = await this.columnsRepository.findOneBy({boardId, columnId});
@@ -138,9 +134,6 @@ export class ColumnsService {
     await this.columnsRepository.save(column);
   }
  
-
-
-
   async remove(boardId:number, columnId: number) {
     this.findOne(boardId,columnId);
     await this.columnsRepository.delete({boardId,columnId});
