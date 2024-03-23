@@ -5,7 +5,7 @@ import { Role } from 'src/types/role.type';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
-export class MemberGuard extends AuthGuard('jwt') implements CanActivate {
+export class AdminGuard extends AuthGuard('jwt') implements CanActivate {
   constructor(
     private readonly memberService: MemberService,
     private readonly userService: UserService,
@@ -26,9 +26,10 @@ export class MemberGuard extends AuthGuard('jwt') implements CanActivate {
     let boardId = request.params.boardId;
     const member = await this.memberService.findMember(+boardId, user.userId);
 
-    if (!member || member.role === Role.User) {
+    if (!member || member.role === Role.User || member.role === Role.Member) {
       return false;
     }
+  
     return true;
   }
 }
