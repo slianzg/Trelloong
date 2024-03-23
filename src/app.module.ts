@@ -4,17 +4,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { MemberModule } from './member/member.module';
 import { BoardModule } from './board/board.module';
-import { ColumnModule } from './column/column.module';
 import { CardModule } from './card/card.module';
 import { CommentModule } from './comment/comment.module';
 import Joi from 'joi';
-import { Member } from './member/entities/member.entity';
-import { Board } from './board/entities/board.entity';
-import { Column } from './column/entities/column.entity';
 import { Card } from './card/entities/card.entity';
 import { Comment } from './comment/entities/comment.entity';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
+import { Board } from './board/entities/board.entity';
+import { Member } from './member/entities/member.entity';
+
+import { Columns } from './column/entities/column.entity';
+import { ColumnModule } from './column/column.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -27,7 +29,7 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [Member, Board, Column, Card, Comment, User],
+    entities: [User, Member, Board, Columns, Card, Comment],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -49,6 +51,7 @@ const typeOrmModuleOptions = {
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    AuthModule,
     MemberModule,
     BoardModule,
     ColumnModule,
