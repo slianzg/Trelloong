@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardService } from './board.service';
@@ -11,14 +10,13 @@ import { UserModule } from 'src/user/user.module';
 import { MemberModule } from 'src/member/member.module';
 
 @Module({
-    imports: [
-      TypeOrmModule.forFeature([Board, User, Member]),
-      UserModule,
+  imports: [
+    TypeOrmModule.forFeature([Board, User, Member]),
+    UserModule,
     MemberModule,
   ],
-    providers: [BoardService, SendEmailService],
-    controllers: [BoardController],
-    exports: [BoardService],
-  })
+  providers: [BoardService, SendEmailService],
+  controllers: [BoardController],
+  exports: [BoardService],
+})
 export class BoardModule {}
-

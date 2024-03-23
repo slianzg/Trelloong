@@ -21,7 +21,7 @@ export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
 
   //컬럼 생성
-  @UseGuards(AuthGuard('jwt'), MemberGuard)
+  @UseGuards(MemberGuard)
   @Post('create')
   async create(
     @Param('boardId') boardId: number,
