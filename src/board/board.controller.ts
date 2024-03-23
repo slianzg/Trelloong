@@ -19,7 +19,6 @@ import { InviteBoardDto } from './dto/inviteBoard.dto';
 import { User } from 'src/user/entities/user.entity';
 import { AuthConfirmDto } from './dto/authConfirm.dto';
 import { MemberGuard } from 'src/auth/member.guard';
-import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/types/role.type';
 
 @Controller('board')
@@ -49,7 +48,6 @@ export class BoardController {
 
   // 보드 수정
   @UseGuards(MemberGuard)
-  @Roles(Role.Admin)
   @Patch('update/:boardId')
   async updatedBoard(
     @Param('boardId') boardId: number,
@@ -63,7 +61,6 @@ export class BoardController {
 
   // 보드 삭제
   @UseGuards(MemberGuard)
-  @Roles(Role.Admin)
   @Delete('delete/:boardId')
   async deleteBoard(
     @UserInfo() user: User,
@@ -85,7 +82,6 @@ export class BoardController {
 
   // 멤버 초대
   @UseGuards(MemberGuard)
-  @Roles(Role.Admin)
   @Post('invite/:boardId')
   async inviteMember(
     @Param('boardId') boardId: number,
