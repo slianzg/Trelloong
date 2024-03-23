@@ -14,7 +14,6 @@ import { UpdateColumnDto } from './dto/update-column.dto';
 import { Columns } from './entities/column.entity';
 import { UpdateColumnOrderDto } from './dto/updatecolumnorder-column.dto';
 import { MemberGuard } from 'src/auth/member.guard';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('board/:boardId/column')
 export class ColumnsController {

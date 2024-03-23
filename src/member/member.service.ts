@@ -11,9 +11,8 @@ export class MemberService {
     @InjectRepository(Member)
     private memberRepository: Repository<Member>,
   ) {}
-  
+
   async findMember(boardId: number, userId: number) {
-    //console.log(boardId,"-----------------------------",userId)
     return await this.memberRepository.findOne({ where: { boardId, userId } });
   }
   create(createMemberDto: CreateMemberDto) {
@@ -35,6 +34,4 @@ export class MemberService {
   remove(id: number) {
     return `This action removes a #${id} member`;
   }
-
-  
 }
