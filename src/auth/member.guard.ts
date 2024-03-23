@@ -19,10 +19,14 @@ export class MemberGuard extends AuthGuard('jwt') implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const { user } = context.switchToHttp().getRequest();
 
-    let boardId = request.params.boardId;
-
+    const boardId = request.params.boardId;
+    //MemberService 주입 대기
+    // while (!this.memberService) {
+    // await new Promise(resolve => setTimeout(resolve, 100));
+    // }
+    console.log(this.memberService)
     const member = await this.memberService.findMember(boardId, user.userId);
-
+    
     if (!member || member.role === Role.User) {
       return false;
     }
