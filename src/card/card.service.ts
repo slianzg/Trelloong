@@ -17,9 +17,9 @@ export class CardService {
 
   async create(createCardDto: CreateCardDto, columnId: number) {
     const { cardName } = createCardDto;
-
+    console.log('---------->', columnId);
     const card = await this.cardRepository.findOne({
-      where: { columnId },
+      where: { columnId: +columnId },
       order: { cardOrder: 'DESC' },
     });
     if (card.cardOrder) {

@@ -1,4 +1,11 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Columns } from 'src/column/entities/column.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({
   name: 'cards',
@@ -28,6 +35,9 @@ export class Card {
   @Column({ type: 'json', nullable: true })
   assignedTo: any[];
 
-  @Column()
-  columnId: number;
+  @ManyToOne(() => Columns, (columns) => columns.cards, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'columnId', referencedColumnName: 'columnId' }])
+  columns: Columns;
 }
