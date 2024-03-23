@@ -162,7 +162,10 @@ export class ColumnsService {
   }
 
   async remove(boardId: number, columnId: number) {
-    const columnRemove = await this.columnsRepository.findOneBy({boardId,columnId});
+    const columnRemove = await this.columnsRepository.findOneBy({
+      boardId,
+      columnId,
+    });
 
     if (!columnRemove) {
       throw new NotFoundException(
@@ -171,21 +174,21 @@ export class ColumnsService {
     }
     const deletedColumnorder = columnRemove.columnOrder;
 
-    await this.columnsRepository.delete({boardId,columnId});
+    await this.columnsRepository.delete({ boardId, columnId });
 
-      // 새로운 순서가 기존 순서보다 큰 경우
-     {
+    // 새로운 순서가 기존 순서보다 큰 경우
+    {
       await this.columnsRepository
-      .createQueryBuilder()
-      .update(Columns)
-      .set({
-        columnOrder: () => 'columnOrder - 1',
-      })
-      .where('columnOrder > :deletedColumnorder AND boardId = :boardId', { deletedColumnorder, boardId })
-      .execute();
+        .createQueryBuilder()
+        .update(Columns)
+        .set({
+          columnOrder: () => 'columnOrder - 1',
+        })
+        .where('columnOrder > :deletedColumnorder AND boardId = :boardId', {
+          deletedColumnorder,
+          boardId,
+        })
+        .execute();
+    }
   }
-
-  }
-
-  
 }

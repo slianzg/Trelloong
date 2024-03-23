@@ -6,13 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { MemberInfo } from 'util/memberInfo.decorator';
 import { Member } from 'src/member/entities/member.entity';
+import { MemberGuard } from 'src/auth/member.guard';
 
+@UseGuards(MemberGuard)
 @Controller('column/:columnId/card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}

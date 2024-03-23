@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
   UseGuards,
 } from '@nestjs/common';
 import { ColumnsService } from './column.service';
@@ -17,7 +16,7 @@ import { UpdateColumnOrderDto } from './dto/updatecolumnorder-column.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @UseGuards(AuthGuard('jwt'))
-@Controller(':boardId/column')
+@Controller('board/:boardId/column')
 export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
 

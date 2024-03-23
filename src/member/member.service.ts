@@ -43,4 +43,8 @@ export class MemberService {
       }
     }
   }
+
+  async findMember(boardId: number, userId: number) {
+    return await this.memberRepository.findOne({ where: { boardId, userId } });
+  }
 }
