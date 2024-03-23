@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
   UseGuards,
 } from '@nestjs/common';
 import { ColumnsService } from './column.service';

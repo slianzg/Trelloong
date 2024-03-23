@@ -160,27 +160,35 @@ export class ColumnsService {
     column.columnOrder = columnOrder;
     await this.columnsRepository.save(column);
   }
- 
 
+  async remove(boardId: number, columnId: number) {
+    const columnRemove = await this.columnsRepository.findOneBy({
+      boardId,
+      columnId,
+    });
 
+    if (!columnRemove) {
+      throw new NotFoundException(
+        ` id${columnId} 컬럼이나  id${boardId} 보드가 없습니다.`,
+      );
+    }
+    const deletedColumnorder = columnRemove.columnOrder;
 
-  async remove(boardId:number, columnId: number) {
-    this.findOne(boardId,columnId);
-    await this.columnsRepository.delete({boardId,columnId});
+    await this.columnsRepository.delete({ boardId, columnId });
 
-      // 새로운 순서가 기존 순서보다 큰 경우
-     {
+    // 새로운 순서가 기존 순서보다 큰 경우
+    {
       await this.columnsRepository
-      .createQueryBuilder()
-      .update(Columns)
-      .set({
-        columnOrder: () => 'columnOrder - 1',
-      })
-      .where('columnOrder > :deletedColumnorder AND boardId = :boardId', { deletedColumnorder, boardId })
-      .execute();
+        .createQueryBuilder()
+        .update(Columns)
+        .set({
+          columnOrder: () => 'columnOrder - 1',
+        })
+        .where('columnOrder > :deletedColumnorder AND boardId = :boardId', {
+          deletedColumnorder,
+          boardId,
+        })
+        .execute();
+    }
   }
-
-  }
-
-  
 }
