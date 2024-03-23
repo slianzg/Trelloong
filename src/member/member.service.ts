@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Member } from './entities/member.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class MemberService {
+  constructor(
+    @InjectRepository(Member)
+    private memberRepository: Repository<Member>,
+  ) {}
+
   create(createMemberDto: CreateMemberDto) {
     return 'This action adds a new member';
   }
@@ -22,5 +30,9 @@ export class MemberService {
 
   remove(id: number) {
     return `This action removes a #${id} member`;
+  }
+
+  async findMember(boardId: number, userId: number) {
+    return await this.memberRepository.findOne({ where: { boardId, userId } });
   }
 }
