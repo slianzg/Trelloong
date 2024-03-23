@@ -21,10 +21,6 @@ export class Card {
 
   @Column({ type: 'bigint', default: 1 })
   cardOrder: number;
-  @BeforeInsert()
-  increaseOrder() {
-    this.cardOrder++;
-  }
 
   @Column({ type: 'varchar', nullable: true })
   cardColor: string;

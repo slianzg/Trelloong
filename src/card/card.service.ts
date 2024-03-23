@@ -3,7 +3,7 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import _ from 'lodash';
 import { MemberService } from 'src/member/member.service';
 
@@ -17,6 +17,19 @@ export class CardService {
 
   async create(createCardDto: CreateCardDto, columnId: number) {
     const { cardName } = createCardDto;
+
+    const card = await this.cardRepository.findOne({
+      where: { columnId },
+      order: { cardOrder: 'DESC' },
+    });
+    if (card.cardOrder) {
+      const cardOrder = card.cardOrder + 1;
+      await this.cardRepository.save({
+        cardName,
+        columnId,
+        cardOrder,
+      });
+    }
 
     await this.cardRepository.save({
       cardName,
@@ -77,5 +90,68 @@ export class CardService {
   async delete(columnId: number, cardId: number) {
     this.findOne(columnId, cardId);
     await this.cardRepository.delete({ columnId, cardId });
+  }
+
+  async updateCardOrder(cardId: number, columnId: number, cardOrder: number) {
+    const card = await this.cardRepository.findOne({ where: { cardId } });
+    const prevColumnId = card.columnId;
+    const prevCardOrder = card.cardOrder;
+
+    if (columnId === prevColumnId) {
+      if (prevCardOrder < cardOrder) {
+        // prevCardOrder+1 ~ 가고싶은 cardOrder까지인 애들이 -1씩
+        await this.moveCard(card, prevCardOrder + 1, cardOrder, -1);
+      } else {
+        // prevCardOrder-1 ~ 가고싶은 cardOrder까지인 애들이 +1씩
+        await this.moveCard(card, prevCardOrder - 1, cardOrder, +1);
+      }
+    } else {
+      // 1. previousColumnId 인 카드들은 previousCardOrder보다 뒤에있는 카드라면 전부 순서가 1씩 당겨져야 한다.
+      await this.cardRepository
+        .createQueryBuilder()
+        .update(Card)
+        .set({ cardOrder: () => 'cardOrder-1' })
+        .where('columnId = :prevColumnId AND cardOrder >= :prevCardOrder', {
+          prevColumnId,
+          prevCardOrder,
+        })
+        .execute();
+      // 2. columnId 인 카드들은 cardOrder보다 뒤에있는 카드라면 전부 순서가 뒤로 +1씩 늘어나야한다.
+      await this.cardRepository
+        .createQueryBuilder()
+        .update(Card)
+        .set({ cardOrder: () => 'cardOrder+1' })
+        .where('columnId=:columnId AND cardOrder >= :cardOrder', {
+          columnId,
+          cardOrder,
+        })
+        .execute();
+
+      await this.cardRepository
+        .createQueryBuilder()
+        .update(Card)
+        .set({ cardOrder: cardOrder })
+        .where('cardId = cardID', { cardId })
+        .execute();
+    }
+  }
+
+  async moveCard(
+    card: Card,
+    startOrder: number,
+    endOrder: number,
+    step: number,
+  ) {
+    const cardsUpdate = await this.cardRepository.find({
+      where: {
+        columnId: card.columnId,
+        cardOrder: Between(startOrder, endOrder),
+      },
+    });
+    for (const cardUpdate of cardsUpdate) {
+      if (cardUpdate.cardId === card.cardId) continue;
+      cardUpdate.cardOrder += step;
+      await this.cardRepository.save(cardUpdate);
+    }
   }
 }

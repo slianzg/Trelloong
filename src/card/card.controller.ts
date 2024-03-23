@@ -13,11 +13,11 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { MemberInfo } from 'util/memberInfo.decorator';
 import { Member } from 'src/member/entities/member.entity';
 
-@Controller('card')
+@Controller(':columnId/card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
-  @Post(':columnId')
+  @Post('create')
   async create(
     @Param('columnId') columnId: number,
     @Body() createCardDto: CreateCardDto,
@@ -25,12 +25,12 @@ export class CardController {
     await this.cardService.create(createCardDto, +columnId);
   }
 
-  @Get(':columnId')
+  @Get('cardList')
   findAll(@Param('columnId') columnId: number) {
     return this.cardService.findAll(+columnId);
   }
 
-  @Get(':columnId/:cardId')
+  @Get('cardInfo/:cardId')
   findOne(
     @Param('columnId') columnId: number,
     @Param('cardId') cardId: number,
@@ -38,17 +38,22 @@ export class CardController {
     return this.cardService.findOne(+columnId, +cardId);
   }
 
-  @Patch(':columnId/:cardId')
-  update(
+  @Patch('update/:cardId')
+  cardUpdate(
     @MemberInfo() member: Member,
     @Param('columnId') columnId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardeDto: UpdateCardDto,
   ) {
-    this.cardService.update(member.boardId, +columnId, +cardId, updateCardeDto);
+    this.cardService.cardUpdate(
+      member.boardId,
+      +columnId,
+      +cardId,
+      updateCardeDto,
+    );
   }
 
-  @Delete(':columnId/:cardId')
+  @Delete('delete/:cardId')
   async delete(
     @Param('columnId') columnId: number,
     @Param('cardId') cardId: number,
