@@ -13,7 +13,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { MemberInfo } from 'util/memberInfo.decorator';
 import { Member } from 'src/member/entities/member.entity';
 
-@Controller(':columnId/card')
+@Controller('column/:columnId/card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
