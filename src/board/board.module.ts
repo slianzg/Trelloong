@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardService } from './board.service';
@@ -16,3 +17,4 @@ import { SendEmailService } from 'src/utils/sendEmail.service';
     exports: [BoardService],
   })
 export class BoardModule {}
+
