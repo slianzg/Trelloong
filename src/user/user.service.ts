@@ -1,10 +1,3 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
@@ -15,6 +8,7 @@ import { Repository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import _ from 'lodash';
 import { JwtService } from '@nestjs/jwt';
+import { Injectable, ConflictException, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class UserService {

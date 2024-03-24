@@ -11,7 +11,6 @@ import {
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { MemberInfo } from 'util/memberInfo.decorator';
 import { Member } from 'src/member/entities/member.entity';
 import { MemberGuard } from 'src/auth/member.guard';
 import { UpdateCardOrderDto } from './dto/update-cardOrder.dto';
@@ -29,15 +28,16 @@ export class CardController {
     await this.cardService.create(createCardDto, +columnsId);
     return { message: '카드가 생성되었습니다.' };
   }
+
   @Patch('update/:cardId')
   async cardUpdate(
-    @MemberInfo() member: Member,
+    @Param('boardId') boardId: Member,
     @Param('columnsId') columnsId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardeDto: UpdateCardDto,
   ) {
     await this.cardService.cardUpdate(
-      +member.boardId,
+      +boardId,
       +columnsId,
       +cardId,
       updateCardeDto,
@@ -46,16 +46,16 @@ export class CardController {
   }
 
   @Get('cardList')
-  findAll(@Param('columnsId') columnId: number) {
-    return this.cardService.findAll(+columnId);
+  async findAll(@Param('columnsId') columnId: number) {
+    return await this.cardService.findAll(+columnId);
   }
 
   @Get('cardInfo/:cardId')
-  findOne(
+  async findOne(
     @Param('columnsId') columnId: number,
     @Param('cardId') cardId: number,
   ) {
-    return this.cardService.findOne(+columnId, +cardId);
+    return await this.cardService.findOne(+columnId, +cardId);
   }
 
   @Delete('delete/:cardId')
@@ -63,6 +63,7 @@ export class CardController {
     @Param('columnsId') columnsId: number,
     @Param('cardId') cardId: number,
   ) {
+
     await this.cardService.delete(+columnsId, +cardId);
     return { message: '카드가 삭제되었습니다.' };
   }
@@ -79,5 +80,18 @@ export class CardController {
       updateCardOrderDto,
     );
     return { message: '카드의 순서가 수정되었습니다.' };
+  }
+
+  @Post('setDueDate/:cardId')
+  async setDueDate(
+    @Param('columnsId') columnsId: number,
+    @Param('cardId') cardId: number,
+    @Body('dueDate') dueDate: Date
+  ) {
+    try {
+      return await this.cardService.setDueDate(columnsId, cardId, dueDate);
+    } catch (err) {
+      return { message: `${err}` }
+    }
   }
 }

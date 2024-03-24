@@ -22,24 +22,24 @@ import { AuthConfirmDto } from './dto/authConfirm.dto';
 
 @Injectable()
 export class BoardService {
-    constructor (
-        @InjectRepository(Board)
-        private boardRepository : Repository<Board>,
-        @InjectRepository(User)
-        private userRepository : Repository<User>,
-        @InjectRepository(Member)
-        private memberRepository : Repository<Member>,
-        private sendEmailService : SendEmailService
-        ) {}
-    
-    // 보드 생성
-    async createBoard (createBoardDto : CreateBoardDto, userId : number) {
-        const boardInfo = await this.boardRepository.save({
-            boardName : createBoardDto.boardName,
-            boardDescription : createBoardDto.boardDescription,
-            boardColor : createBoardDto.boardColor,
-            userId
-        })
+  constructor(
+    @InjectRepository(Board)
+    private boardRepository: Repository<Board>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Member)
+    private memberRepository: Repository<Member>,
+    private sendEmailService: SendEmailService,
+  ) {}
+
+  // 보드 생성
+  async createBoard(createBoardDto: CreateBoardDto, userId: number) {
+    const boardInfo = await this.boardRepository.save({
+      boardName: createBoardDto.boardName,
+      boardDescription: createBoardDto.boardDescription,
+      boardColor: createBoardDto.boardColor,
+      userId,
+    });
     await this.memberRepository.save({
       userId,
       boardId: boardInfo.boardId,
@@ -88,7 +88,7 @@ export class BoardService {
     if (!boardId) {
       throw new NotFoundException('삭제 하려는 보드가 존재하지 않습니다.');
     }
-    
+
     // 삭제하기 위한 비밀번호 검증
     const savedPassword = await this.userRepository.findOne({
       where: {
@@ -151,30 +151,32 @@ export class BoardService {
     }
     // 초대할 유저가 해당 보드에 요청 받았던 전적이 있는지 확인
     const savedMember = await this.memberRepository.findOne({
-      where : {
+      where: {
         boardId,
-        userId : inviteUser.userId
-      }
-    })
+        userId: inviteUser.userId,
+      },
+    });
     if (savedMember) {
-      throw new NotAcceptableException ('같은 사용자에게 여러번 초대를 보낼 수 없습니다.')
+      throw new NotAcceptableException(
+        '같은 사용자에게 여러번 초대를 보낼 수 없습니다.',
+      );
     }
     if (!savedMember) {
-    const randomNum = () => {
-      // 랜덤한 숫자로 구성된 토큰 생성
-      return Math.floor(1000 + Math.random() * 9000);
-    };
-    const token = randomNum();
-    
-    await this.memberRepository.save({
-      userId: inviteUser.userId,
-      boardId: boardId,
-      role: Role.User, // 초대 대기 상태
-      verificationToken: token,
-    });
-    
-    await this.sendEmailService.sendInvitationEmail(inviteUser.email, token);
-  }
+      const randomNum = () => {
+        // 랜덤한 숫자로 구성된 토큰 생성
+        return Math.floor(1000 + Math.random() * 9000);
+      };
+      const token = randomNum();
+
+      await this.memberRepository.save({
+        userId: inviteUser.userId,
+        boardId: boardId,
+        role: Role.User, // 초대 대기 상태
+        verificationToken: token,
+      });
+
+      await this.sendEmailService.sendInvitationEmail(inviteUser.email, token);
+    }
   }
 
   // 인증 확인

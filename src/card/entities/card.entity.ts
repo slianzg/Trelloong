@@ -22,6 +22,7 @@ export class Card {
 
   @Column({ type: 'date', nullable: true })
   dueDate: Date;
+
   setDueDate(date: Date) {
     this.dueDate = date;
   }
