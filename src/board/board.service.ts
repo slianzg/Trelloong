@@ -35,30 +35,33 @@ export class BoardService {
 
   // 보드 생성
   async createBoard(createBoardDto: CreateBoardDto, userId: number) {
-    const { boardName, boardDescription, boardColor } = createBoardDto
+    const { boardName, boardDescription, boardColor } = createBoardDto;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       const boardInfo = await queryRunner.manager.getRepository(Board).save({
-      boardName,
-      boardDescription,
-      boardColor,
-      userId,
-    });
-    await queryRunner.manager.getRepository(Member).save({
-      userId,
-      boardId: boardInfo.boardId,
-      role: Role.Admin,
-      verificationToken: null,
-    });
+        boardName,
+        boardDescription,
+        boardColor,
+        userId,
+      });
+      await queryRunner.manager.getRepository(Member).save({
+        userId,
+        boardId: boardInfo.boardId,
+        role: Role.Admin,
+        verificationToken: null,
+      });
       await queryRunner.commitTransaction();
-      return boardInfo;
-    } catch (error) {
+      return {
+        status: 200,
+        message: '보드 생성이 완료 되었습니다.',
+        boardInfo,
+      };
+    } catch (err) {
       await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
       await queryRunner.release();
+      return { status: err.status, message: err };
     }
   }
 
