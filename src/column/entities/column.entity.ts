@@ -6,19 +6,22 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
     name : 'columns'
 })
 export class Columns {
+    static find(arg0: any) {
+      throw new Error('Method not implemented.');
+    }
     @PrimaryGeneratedColumn()
     columnId : number
 
     @Column ({type : 'varchar', nullable : false })
     columnName : string
 
-    @Column ({type : 'bigint', nullable : false })
+    @Column ({type : 'int', nullable : false })
     columnOrder : number
 
     @Column ({type : 'bigint', name : 'boardId', nullable : false})
     boardId : number
 
-    @ManyToOne(() => Board, (board) => board.column)
+    @ManyToOne(() => Board, (board) => board.column, { onDelete: 'CASCADE' })
     @JoinColumn({ name : 'boardId' })
     board : Board
 }
