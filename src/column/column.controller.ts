@@ -15,6 +15,7 @@ import { Columns } from './entities/column.entity';
 import { UpdateColumnOrderDto } from './dto/updatecolumnorder-column.dto';
 import { MemberGuard } from 'src/auth/member.guard';
 
+@UseGuards(MemberGuard)
 @Controller('board/:boardId/column')
 export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}

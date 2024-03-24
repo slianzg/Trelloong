@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Member } from 'src/member/entities/member.entity';
 import { MemberService } from 'src/member/member.service';
 import { Role } from 'src/types/role.type';
 
@@ -20,11 +21,13 @@ export class MemberGuard extends AuthGuard('jwt') implements CanActivate {
     const { user } = context.switchToHttp().getRequest();
 
     let boardId = request.params.boardId;
+
     const member = await this.memberService.findMember(+boardId, user.userId);
 
     if (!member || member.role === Role.User) {
       return false;
     }
+    request.member = member;
     return true;
   }
 }
