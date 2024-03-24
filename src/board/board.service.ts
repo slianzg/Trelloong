@@ -81,7 +81,7 @@ export class BoardService {
 
   // 보드 삭제
   async deleteBoard(
-    user: User,
+    userEmail: string,
     boardId: number,
     deleteBoardDto: DeleteBoardDto,
   ) {
@@ -92,7 +92,7 @@ export class BoardService {
     // 삭제하기 위한 비밀번호 검증
     const savedPassword = await this.userRepository.findOne({
       where: {
-        email: user.email,
+        email: userEmail,
       },
       select: {
         password: true,
