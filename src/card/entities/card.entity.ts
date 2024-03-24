@@ -26,7 +26,7 @@ export class Card {
     this.dueDate = date;
   }
 
-  @Column({ type: 'bigint' })
+  @Column({ type: 'int' })
   cardOrder: number;
 
   @Column({ type: 'varchar', nullable: true })
@@ -40,6 +40,6 @@ export class Card {
   })
   columns: Columns;
 
-  @Column({ type: 'bigint', name: 'columnsId' })
+  @Column({ type: 'int', name: 'columnsId' })
   columnsId: number;
 }

@@ -7,8 +7,8 @@ import { Between, Repository } from 'typeorm';
 import _ from 'lodash';
 import { MemberService } from 'src/member/member.service';
 import { MemberGuard } from 'src/auth/member.guard';
+import { UpdateCardOrderDto } from './dto/update-cardOrder.dto';
 
-@UseGuards(MemberGuard)
 @Injectable()
 export class CardService {
   constructor(
@@ -80,11 +80,17 @@ export class CardService {
     }
     if (assignedTo) {
       await this.memberService.compare(+boardId, assignedTo);
-      for (let existId in card.assignedTo) {
-        for (let inputId in assignedTo) {
-          +existId === +inputId
-            ? existId === null
-            : card.assignedTo.push(+inputId);
+      if (_.isNil(card.assignedTo)) {
+        card.assignedTo = [];
+        card.assignedTo.push(+assignedTo);
+      } else {
+        for (let existId of card.assignedTo) {
+          if (+existId === +assignedTo) {
+            let i = card.assignedTo.indexOf(+assignedTo);
+            card.assignedTo.splice(i, 1);
+          } else {
+            card.assignedTo.push(+assignedTo);
+          }
         }
       }
     }
@@ -113,18 +119,25 @@ export class CardService {
       .execute();
   }
 
-  async updateCardOrder(cardId: number, columnId: number, cardOrder: number) {
-    const card = await this.cardRepository.findOne({ where: { cardId } });
+  async updateCardOrder(
+    cardId: number,
+    columnsId: number,
+    updateCardOrderDto: UpdateCardOrderDto,
+  ) {
+    const { inputColumn, inputOrder } = updateCardOrderDto;
+    const card = await this.cardRepository.findOne({
+      where: { cardId, columnsId },
+    });
     const prevColumnId = card.columnsId;
     const prevCardOrder = card.cardOrder;
 
-    if (columnId === prevColumnId) {
-      if (prevCardOrder < cardOrder) {
+    if (inputColumn === prevColumnId) {
+      if (prevCardOrder < inputOrder) {
         // prevCardOrder+1 ~ 가고싶은 cardOrder까지인 애들이 -1씩
-        await this.moveCard(card, prevCardOrder + 1, cardOrder, -1);
+        await this.moveCard(card, prevCardOrder + 1, inputOrder, -1);
       } else {
         // prevCardOrder-1 ~ 가고싶은 cardOrder까지인 애들이 +1씩
-        await this.moveCard(card, prevCardOrder - 1, cardOrder, +1);
+        await this.moveCard(card, prevCardOrder - 1, inputOrder, +1);
       }
     } else {
       // 1. previousColumnId 인 카드들은 previousCardOrder보다 뒤에있는 카드라면 전부 순서가 1씩 당겨져야 한다.
@@ -143,15 +156,15 @@ export class CardService {
         .update(Card)
         .set({ cardOrder: () => 'cardOrder+1' })
         .where('columnId=:columnId AND cardOrder >= :cardOrder', {
-          columnId,
-          cardOrder,
+          columnsId,
+          cardOrder: inputOrder,
         })
         .execute();
 
       await this.cardRepository
         .createQueryBuilder()
         .update(Card)
-        .set({ cardOrder: cardOrder, columnsId: columnId })
+        .set({ cardOrder: inputOrder, columnsId: columnsId })
         .where('cardId = cardID', { cardId })
         .execute();
     }
@@ -169,10 +182,12 @@ export class CardService {
         cardOrder: Between(startOrder, endOrder),
       },
     });
+    card.cardOrder = endOrder;
     for (const cardUpdate of cardsUpdate) {
       if (cardUpdate.cardId === card.cardId) continue;
       cardUpdate.cardOrder += step;
       await this.cardRepository.save(cardUpdate);
     }
+    await this.cardRepository.save(card);
   }
 }
