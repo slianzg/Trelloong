@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,7 +6,9 @@ import { Card } from './entities/card.entity';
 import { Between, Repository } from 'typeorm';
 import _ from 'lodash';
 import { MemberService } from 'src/member/member.service';
+import { MemberGuard } from 'src/auth/member.guard';
 
+@UseGuards(MemberGuard)
 @Injectable()
 export class CardService {
   constructor(
@@ -15,36 +17,35 @@ export class CardService {
     private readonly memberService: MemberService,
   ) {}
 
-  async create(createCardDto: CreateCardDto, columnId: number) {
+  async create(createCardDto: CreateCardDto, columnsId: number) {
     const { cardName } = createCardDto;
-    console.log('---------->', columnId);
+
     const card = await this.cardRepository.findOne({
-      where: { columnId: +columnId },
+      where: { columnsId },
       order: { cardOrder: 'DESC' },
     });
-    if (card.cardOrder) {
-      const cardOrder = card.cardOrder + 1;
-      await this.cardRepository.save({
-        cardName,
-        columnId,
-        cardOrder,
-      });
+
+    let cardOrder = 1;
+
+    if (card) {
+      cardOrder = +card.cardOrder + 1;
     }
 
     await this.cardRepository.save({
       cardName,
-      columnId,
+      columnsId,
+      cardOrder: +cardOrder,
     });
   }
 
-  findAll(columnId: number): Promise<Card[]> {
+  findAll(columnsId: number): Promise<Card[]> {
     return this.cardRepository.find({
-      where: { columnId },
+      where: { columnsId },
     });
   }
 
-  findOne(columnId: number, cardId: number) {
-    const card = this.cardRepository.findOneBy({ columnId, cardId });
+  findOne(columnsId: number, cardId: number) {
+    const card = this.cardRepository.findOneBy({ columnsId, cardId });
     if (_.isNil(card)) {
       throw new NotFoundException('해당 카드를 찾을 수 없습니다.');
     }
@@ -53,13 +54,16 @@ export class CardService {
 
   async cardUpdate(
     boardId: number,
-    columnId: number,
+    columnsId: number,
     cardId: number,
     updateCardeDto: UpdateCardDto,
   ) {
     const { cardName, cardDescription, cardColor, assignedTo } = updateCardeDto;
 
-    const card = await this.cardRepository.findOneBy({ columnId, cardId });
+    const card = await this.cardRepository.findOneBy({
+      columnsId: +columnsId,
+      cardId: +cardId,
+    });
 
     if (_.isNil(card)) {
       throw new NotFoundException('카드를 찾지 못 했습니다.');
@@ -78,9 +82,9 @@ export class CardService {
       await this.memberService.compare(+boardId, assignedTo);
       for (let existId in card.assignedTo) {
         for (let inputId in assignedTo) {
-          existId === inputId
+          +existId === +inputId
             ? existId === null
-            : card.assignedTo.push(inputId);
+            : card.assignedTo.push(+inputId);
         }
       }
     }
@@ -88,22 +92,22 @@ export class CardService {
     await this.cardRepository.save(card);
   }
 
-  async delete(columnId: number, cardId: number) {
-    const deletedCard = await this.findOne(columnId, cardId);
+  async delete(columnsId: number, cardId: number) {
+    const deletedCard = await this.findOne(columnsId, cardId);
     if (!deletedCard) {
       throw new NotFoundException('해당 카드를 찾을 수 없습니다');
     }
 
     const deleteCardOrder = deletedCard.cardOrder;
 
-    await this.cardRepository.delete({ columnId, cardId });
+    await this.cardRepository.delete({ columnsId, cardId });
 
     await this.cardRepository
       .createQueryBuilder()
       .update(Card)
       .set({ cardOrder: () => 'cardOrder-1' })
       .where('columnId = :columnId AND cardOrder > :deleteCardOrder', {
-        columnId: deletedCard.columnId,
+        columnId: deletedCard.columnsId,
         deleteCardOrder,
       })
       .execute();
@@ -111,7 +115,7 @@ export class CardService {
 
   async updateCardOrder(cardId: number, columnId: number, cardOrder: number) {
     const card = await this.cardRepository.findOne({ where: { cardId } });
-    const prevColumnId = card.columnId;
+    const prevColumnId = card.columnsId;
     const prevCardOrder = card.cardOrder;
 
     if (columnId === prevColumnId) {
@@ -147,7 +151,7 @@ export class CardService {
       await this.cardRepository
         .createQueryBuilder()
         .update(Card)
-        .set({ cardOrder: cardOrder, columnId: columnId })
+        .set({ cardOrder: cardOrder, columnsId: columnId })
         .where('cardId = cardID', { cardId })
         .execute();
     }
@@ -161,7 +165,7 @@ export class CardService {
   ) {
     const cardsUpdate = await this.cardRepository.find({
       where: {
-        columnId: card.columnId,
+        columnsId: card.columnsId,
         cardOrder: Between(startOrder, endOrder),
       },
     });

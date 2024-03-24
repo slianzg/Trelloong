@@ -26,7 +26,7 @@ export class Card {
     this.dueDate = date;
   }
 
-  @Column({ type: 'bigint', default: 1 })
+  @Column({ type: 'bigint' })
   cardOrder: number;
 
   @Column({ type: 'varchar', nullable: true })
@@ -38,6 +38,8 @@ export class Card {
   @ManyToOne(() => Columns, (columns) => columns.cards, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn([{ name: 'columnId', referencedColumnName: 'columnId' }])
   columns: Columns;
+
+  @Column({ type: 'bigint', name: 'columnsId' })
+  columnsId: number;
 }
