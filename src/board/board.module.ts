@@ -10,11 +10,7 @@ import { UserModule } from 'src/user/user.module';
 import { MemberModule } from 'src/member/member.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Board, User, Member]),
-    UserModule,
-    MemberModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Board, User, Member]), MemberModule],
   providers: [BoardService, SendEmailService],
   controllers: [BoardController],
   exports: [BoardService],

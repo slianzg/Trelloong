@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -8,21 +12,31 @@ import { Comment } from './entities/comment.entity';
 @Injectable()
 export class CommentService {
   constructor(
-    @InjectRepository(Comment) private readonly commentRepository: Repository<Comment>
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
   ) {}
 
-  async createComment(createCommentDto: CreateCommentDto) {
-    return await this.commentRepository.save(createCommentDto)
+  async createComment(
+    createCommentDto: CreateCommentDto,
+    userId: number,
+    cardId: number,
+  ) {
+    const { commentContent } = createCommentDto;
+    return await this.commentRepository.save({
+      userId,
+      cardId,
+      commentContent,
+    });
   }
 
   async findAllComments(cardId: number) {
-    const comments = await this.commentRepository.findBy({ cardId })
+    const comments = await this.commentRepository.findBy({ cardId });
 
     if (!comments) {
-      throw new NotFoundException("댓글이 없습니다.")
-    } 
+      throw new NotFoundException('댓글이 없습니다.');
+    }
     return comments;
-  } 
+  }
 
   async findCommentById(commentId: number) {
     const comment = await this.commentRepository.findOneBy({ commentId });
@@ -34,14 +48,21 @@ export class CommentService {
     return comment;
   }
 
-  async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto) {
+  async updateComment(
+    commentId: number,
+    userId: number,
+    updateCommentDto: UpdateCommentDto,
+  ) {
     const comment = await this.findCommentById(commentId);
 
     if (comment.userId !== userId) {
       throw new UnauthorizedException('해당 댓글을 수정할 권한이 없습니다.');
     }
 
-    const updateComment = await this.commentRepository.update(commentId, updateCommentDto);
+    const updateComment = await this.commentRepository.update(
+      commentId,
+      updateCommentDto,
+    );
 
     return updateComment;
   }
@@ -55,8 +76,6 @@ export class CommentService {
 
     await this.commentRepository.delete(commentId);
 
-    return { message: '해당 댓글이 삭제되었습니다.' }
+    return { message: '해당 댓글이 삭제되었습니다.' };
   }
-
-  
 }
