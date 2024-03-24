@@ -27,20 +27,22 @@ export class CardController {
     @Body() createCardDto: CreateCardDto,
   ) {
     await this.cardService.create(createCardDto, +columnsId);
+    return { message: '카드가 생성되었습니다.' };
   }
   @Patch('update/:cardId')
-  cardUpdate(
+  async cardUpdate(
     @MemberInfo() member: Member,
     @Param('columnsId') columnsId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardeDto: UpdateCardDto,
   ) {
-    this.cardService.cardUpdate(
+    await this.cardService.cardUpdate(
       +member.boardId,
       +columnsId,
       +cardId,
       updateCardeDto,
     );
+    return { message: '카드가 수정되었습니다.' };
   }
 
   @Get('cardList')
@@ -58,18 +60,24 @@ export class CardController {
 
   @Delete('delete/:cardId')
   async delete(
-    @Param('columnsId') columnId: number,
+    @Param('columnsId') columnsId: number,
     @Param('cardId') cardId: number,
   ) {
-    await this.cardService.delete(+columnId, +cardId);
+    await this.cardService.delete(+columnsId, +cardId);
+    return { message: '카드가 삭제되었습니다.' };
   }
 
   @Patch('orderUpdate/:cardId')
-  updateCardOrder(
+  async updateCardOrder(
     @Param('columnsId') columnsId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardOrderDto: UpdateCardOrderDto,
   ) {
-    this.cardService.updateCardOrder(+cardId, +columnsId, updateCardOrderDto);
+    await this.cardService.updateCardOrder(
+      +cardId,
+      +columnsId,
+      updateCardOrderDto,
+    );
+    return { message: '카드의 순서가 수정되었습니다.' };
   }
 }
