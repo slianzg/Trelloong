@@ -16,12 +16,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginDto } from '../user/dto/login.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('USER')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   //회원가입
+  @ApiOperation({ summary: '회원가입' })
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto, @Res() res) {
     const { password, confirmPassword } = createUserDto;
@@ -34,6 +37,7 @@ export class UserController {
   }
 
   //로그인
+  @ApiOperation({ summary: '로그인' })
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res() res) {
     const token = await this.userService.login(loginDto);
@@ -42,6 +46,7 @@ export class UserController {
   }
 
   //내 정보 조회
+  @ApiOperation({ summary: '내 정보 조회' })
   @UseGuards(AuthGuard('jwt'))
   @Get('myPage')
   async getMyInfo(@Req() req) {
@@ -50,6 +55,7 @@ export class UserController {
   }
 
   //내 정보 수정
+  @ApiOperation({ summary: '내 정보 수정' })
   @UseGuards(AuthGuard('jwt'))
   @Patch('myPage/update')
   async updateMyInfo(
@@ -63,6 +69,7 @@ export class UserController {
   }
 
   //회원 탈퇴
+  @ApiOperation({ summary: '회원 탈퇴' })
   @UseGuards(AuthGuard('jwt'))
   @Delete('myPage/withdraw')
   async withdraw(@Req() req, @Body() deleteUserDto: DeleteUserDto, @Res() res) {

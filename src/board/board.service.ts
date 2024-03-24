@@ -7,7 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Board } from './entities/board.entity';
 import { CreateBoardDto } from './dto/createBoard.dto';
 import { UpdatedBoardDto } from './dto/updatedBoard.dto';
@@ -30,23 +30,36 @@ export class BoardService {
     @InjectRepository(Member)
     private memberRepository: Repository<Member>,
     private sendEmailService: SendEmailService,
+    private readonly dataSource: DataSource,
   ) {}
 
   // 보드 생성
   async createBoard(createBoardDto: CreateBoardDto, userId: number) {
-    const boardInfo = await this.boardRepository.save({
-      boardName: createBoardDto.boardName,
-      boardDescription: createBoardDto.boardDescription,
-      boardColor: createBoardDto.boardColor,
-      userId,
-    });
-    await this.memberRepository.save({
-      userId,
-      boardId: boardInfo.boardId,
-      role: Role.Admin,
-      verificationToken: null,
-    });
-    return boardInfo;
+    const { boardName, boardDescription, boardColor } = createBoardDto;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const boardInfo = await queryRunner.manager.getRepository(Board).save({
+        boardName,
+        boardDescription,
+        boardColor,
+        userId,
+      });
+      await queryRunner.manager.getRepository(Member).save({
+        userId,
+        boardId: boardInfo.boardId,
+        role: Role.Admin,
+        verificationToken: null,
+      });
+      await queryRunner.commitTransaction();
+      return boardInfo;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   // 보드 수정
