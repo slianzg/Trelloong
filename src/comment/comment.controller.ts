@@ -7,14 +7,14 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
+@UseGuards(AuthGuard("jwt"))
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) { }
 
-  @UseGuards(AuthGuard(""))
-  @Post()
+  @Post('create')
   async createComment(
-    @Query("cardId") cardId: number,
+    @Param("cardId") cardId: number,
     @Body() createCommentDto: CreateCommentDto,
     // @userInfo() user: User
   ) {
@@ -30,10 +30,9 @@ export class CommentController {
     }
   }
 
-  // @UseGuards(AuthGuard(""))
-  @Get()
+  @Get('commentList')
   async findAllComments(
-    @Query("cardId") cardId: number
+    @Param("cardId") cardId: number
   ) {
     try {
       // await this.cardService.findCardById(cardId)
@@ -44,8 +43,7 @@ export class CommentController {
   }
 
   // 파라미터로 받아와야하는 것들 : commentId, userId, commentContent
-  // @UseGuards(AuthGuard(""))
-  @Patch('/:commentId')
+  @Patch('update/:commentId')
   async updateComment(
     @Param('commentId') commentId: number,
     // @userInfo() user: User,
@@ -59,8 +57,7 @@ export class CommentController {
     }
   }
 
-  // @UseGuards(AuthGuard(""))
-  @Delete('/:commentId')
+  @Delete('delete/:commentId')
   async deleteComment(
     @Param('commentId') commentId: number,
     // @userInfo() user: User,

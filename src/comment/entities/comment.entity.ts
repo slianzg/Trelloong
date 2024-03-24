@@ -25,11 +25,11 @@ export class Comment {
     @Column('date', { nullable: false })
     createdAt: Date;
 
-    // @ManyToOne(() => Member, (member) => member.comments)
+    // @ManyToOne(() => Member, (member) => member.comments, { onDelete: 'CASCADE'})
     // @JoinColumn({ name: "userId", referencedColumnName: "memberId" })
     // member: Member;
 
-    // @ManyToOne(() => Card, (card) => card.comments)
+    // @ManyToOne(() => Card, (card) => card.comments, { onDelete: 'CASCADE'})
     // @JoinColumn({ name: "cardId", referencedColumnName: "cardId" })
     // card: Card;
 }

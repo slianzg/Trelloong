@@ -7,7 +7,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 export class CardController {
   constructor(private readonly cardService: CardService) {}
   
-  @Post('/:cardId')
+  @Post('setDueDate/:cardId')
   async setDueDate(
     @Param('cardId') cardId: number,
     @Body('dueDate') dueDate: Date
