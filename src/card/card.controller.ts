@@ -11,7 +11,6 @@ import {
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { MemberInfo } from 'util/memberInfo.decorator';
 import { Member } from 'src/member/entities/member.entity';
 import { MemberGuard } from 'src/auth/member.guard';
 import { UpdateCardOrderDto } from './dto/update-cardOrder.dto';
@@ -31,13 +30,13 @@ export class CardController {
   }
   @Patch('update/:cardId')
   async cardUpdate(
-    @MemberInfo() member: Member,
+    @Param('boardId') boardId: Member,
     @Param('columnsId') columnsId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardeDto: UpdateCardDto,
   ) {
     await this.cardService.cardUpdate(
-      +member.boardId,
+      +boardId,
       +columnsId,
       +cardId,
       updateCardeDto,

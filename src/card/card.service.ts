@@ -145,7 +145,7 @@ export class CardService {
         .createQueryBuilder()
         .update(Card)
         .set({ cardOrder: () => 'card_order-1' })
-        .where('columnId = :prevColumnId AND cardOrder >= :prevCardOrder', {
+        .where('columnsId = :prevColumnId AND cardOrder >= :prevCardOrder', {
           prevColumnId,
           prevCardOrder,
         })
@@ -155,8 +155,8 @@ export class CardService {
         .createQueryBuilder()
         .update(Card)
         .set({ cardOrder: () => 'card_order+1' })
-        .where('columnId=:columnId AND cardOrder >= :cardOrder', {
-          columnsId,
+        .where('columnsId=:columnsId AND cardOrder >= :cardOrder', {
+          columnsId: inputColumn,
           cardOrder: inputOrder,
         })
         .execute();
@@ -164,8 +164,8 @@ export class CardService {
       await this.cardRepository
         .createQueryBuilder()
         .update(Card)
-        .set({ cardOrder: inputOrder, columnsId: columnsId })
-        .where('cardId = cardID', { cardId })
+        .set({ cardOrder: inputOrder, columnsId: inputColumn })
+        .where('cardId = cardId', { cardId })
         .execute();
     }
   }
