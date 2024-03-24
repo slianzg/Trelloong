@@ -6,9 +6,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
     name : 'columns'
 })
 export class Columns {
-    static find(arg0: any) {
-      throw new Error('Method not implemented.');
-    }
+   
     @PrimaryGeneratedColumn()
     columnId : number
 
