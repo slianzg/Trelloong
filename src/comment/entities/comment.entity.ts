@@ -1,7 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Card } from 'src/card/entities/card.entity';
-import { Member } from 'src/member/entities/member.entity';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'comments' })
 export class Comment {
