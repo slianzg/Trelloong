@@ -62,13 +62,6 @@ export class BoardService {
       throw new BadRequestException('수정사항이 없습니다.');
     }
 
-    // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
-    const boardMember = await this.memberRepository.findOne({
-      where: { userId, boardId },
-    });
-    if (!boardMember) {
-      throw new NotFoundException('보드 멤버가 아닙니다.');
-    }
     // 보드 존재 여부
     const findBoard = await this.boardRepository.findOne({
       where: {
@@ -77,17 +70,6 @@ export class BoardService {
     });
     if (!findBoard) {
       throw new NotFoundException('수정하려는 보드가 존재하지 않습니다.');
-    }
-    // 어드민만 수정 가능
-    const findAminBoard = await this.memberRepository.findOne({
-      where: {
-        boardId,
-        userId,
-        role: Role.Admin,
-      },
-    });
-    if (!findAminBoard) {
-      throw new NotAcceptableException('어드민인 보드만 수정이 가능합니다.');
     }
 
     await this.boardRepository.update(boardId, {
@@ -106,24 +88,7 @@ export class BoardService {
     if (!boardId) {
       throw new NotFoundException('삭제 하려는 보드가 존재하지 않습니다.');
     }
-    // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
-    const boardMember = await this.memberRepository.findOne({
-      where: { userId: user.userId, boardId },
-    });
-    if (!boardMember) {
-      throw new NotFoundException('보드 멤버가 아닙니다.');
-    }
-    // 어드민만 수정 가능
-    const findAminBoard = await this.memberRepository.findOne({
-      where: {
-        boardId,
-        userId: user.userId,
-        role: Role.Admin,
-      },
-    });
-    if (!findAminBoard) {
-      throw new NotAcceptableException('어드민인 보드만 수정이 가능합니다.');
-    }
+    
     // 삭제하기 위한 비밀번호 검증
     const savedPassword = await this.userRepository.findOne({
       where: {
@@ -171,26 +136,6 @@ export class BoardService {
     inviteBoardDto: InviteBoardDto,
     userId: number,
   ) {
-    // 보드 멤버도 아닐 경우 입구컷(보드 가드 작성전 까지만)
-    const boardMember = await this.memberRepository.findOne({
-      where: { userId, boardId },
-    });
-    if (!boardMember) {
-      throw new NotFoundException('보드 멤버가 아닙니다.');
-    }
-    // 본인이 어드민인 보드에 초대하는 것이 맞는지 확인
-    const findOneBoard = await this.memberRepository.findOne({
-      where: {
-        boardId,
-        userId: userId,
-        role: Role.Admin,
-      },
-    });
-    if (!findOneBoard) {
-      throw new NotAcceptableException(
-        '어드민인 보드만 멤버 초대가 가능합니다.',
-      );
-    }
     // 초대할 유저 유무 확인
     const inviteUser = await this.userRepository.findOne({
       where: {
