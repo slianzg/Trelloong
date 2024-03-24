@@ -19,16 +19,16 @@ export class Columns {
   @Column({ type: 'varchar', nullable: false })
   columnName: string;
 
-  @Column({ type: 'bigint', nullable: false })
+  @Column({ type: 'int', nullable: false })
   columnOrder: number;
 
   @Column({ type: 'bigint', name: 'boardId', nullable: false })
   boardId: number;
 
-  @ManyToOne(() => Board, (board) => board.column)
-  @JoinColumn({ name: 'boardId' })
-  board: Board;
-
   @OneToMany(() => Card, (card) => card.columns)
   cards: Card[];
+
+  @ManyToOne(() => Board, (board) => board.column, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'boardId' })
+  board: Board;
 }

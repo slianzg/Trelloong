@@ -1,11 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Member } from 'src/member/entities/member.entity';
 import { MemberService } from 'src/member/member.service';
 import { Role } from 'src/types/role.type';
 
 @Injectable()
-export class MemberGuard extends AuthGuard('jwt') implements CanActivate {
+export class AdminGuard extends AuthGuard('jwt') implements CanActivate {
   constructor(private readonly memberService: MemberService) {
     super();
   }
@@ -19,15 +18,14 @@ export class MemberGuard extends AuthGuard('jwt') implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const { user } = context.switchToHttp().getRequest();
-    
-    let boardId = request.params.boardId;
 
+    let boardId = request.params.boardId;
     const member = await this.memberService.findMember(+boardId, user.userId);
 
-    if (!member || member.role === Role.User) {
+    if (!member || member.role === Role.User || member.role === Role.Member) {
       return false;
     }
-    request.member = member;
+
     return true;
   }
 }

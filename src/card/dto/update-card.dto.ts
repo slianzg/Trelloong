@@ -1,4 +1,10 @@
-import { ArrayMinSize, IsArray, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateCardDto {
   @IsString()
@@ -13,8 +19,7 @@ export class UpdateCardDto {
   @IsOptional()
   cardColor: string;
 
-  @IsArray()
+  @IsNumber()
   @IsOptional()
-  @ArrayMinSize(1)
-  assignedTo: number[];
+  assignedTo: number;
 }

@@ -14,7 +14,6 @@ import { UpdateColumnDto } from './dto/update-column.dto';
 import { Columns } from './entities/column.entity';
 import { UpdateColumnOrderDto } from './dto/updatecolumnorder-column.dto';
 import { MemberGuard } from 'src/auth/member.guard';
-import { AuthGuard } from '@nestjs/passport';
 
 @UseGuards(MemberGuard)
 @Controller('board/:boardId/column')
@@ -22,7 +21,7 @@ export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
 
   //컬럼 생성
-  @UseGuards(AuthGuard('jwt'), MemberGuard)
+  @UseGuards(MemberGuard)
   @Post('create')
   async create(
     @Param('boardId') boardId: number,
