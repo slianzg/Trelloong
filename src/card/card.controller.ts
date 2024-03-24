@@ -15,8 +15,8 @@ import { MemberInfo } from 'util/memberInfo.decorator';
 import { Member } from 'src/member/entities/member.entity';
 import { MemberGuard } from 'src/auth/member.guard';
 
-// @UseGuards(MemberGuard)
-@Controller('column/:columnsId/card')
+@UseGuards(MemberGuard)
+@Controller('/board/:boardId/column/:columnsId/card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
@@ -25,21 +25,19 @@ export class CardController {
     @Param('columnsId') columnsId: number,
     @Body() createCardDto: CreateCardDto,
   ) {
-    await this.cardService.create(createCardDto, +columnsId);
+    return await this.cardService.create(createCardDto, +columnsId);
   }
+
   @Patch('update/:cardId')
-  cardUpdate(
+  async cardUpdate(
     @MemberInfo() member: Member,
     @Param('columnsId') columnId: number,
     @Param('cardId') cardId: number,
     @Body() updateCardeDto: UpdateCardDto,
   ) {
-    console.log('---------->', member.boardId);
-    console.log('---------->', columnId);
-    console.log('---------->', cardId);
-    console.log('---------->', updateCardeDto);
-    this.cardService.cardUpdate(
-      +member.boardId,
+
+    return await this.cardService.cardUpdate(
+      member.boardId,
       +columnId,
       +cardId,
       updateCardeDto,

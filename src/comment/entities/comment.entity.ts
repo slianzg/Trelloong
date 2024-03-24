@@ -8,8 +8,7 @@ export class Comment {
     @PrimaryGeneratedColumn()
     commentId: number;
 
-    @IsNumber()
-    @Column('varchar', { nullable: false })
+    @Column('int', { nullable: false })
     userId: number;
 
     @IsString()
@@ -17,12 +16,10 @@ export class Comment {
     @IsNotEmpty({ message: '내용을 입력하세요.' })
     commentContent: string;
 
-    @IsNumber()
     @Column('int', { nullable: false })
     cardId: number;
 
     @CreateDateColumn()
-    @Column('date', { nullable: false })
     createdAt: Date;
 
     // @ManyToOne(() => Member, (member) => member.comments, { onDelete: 'CASCADE'})

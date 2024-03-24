@@ -36,6 +36,8 @@ export class CommentService {
 
   async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto) {
     const comment = await this.findCommentById(commentId);
+    console.log('--------userId', userId);
+    console.log('--------comment', comment);
 
     if (comment.userId !== userId) {
       throw new UnauthorizedException('해당 댓글을 수정할 권한이 없습니다.');
@@ -53,7 +55,9 @@ export class CommentService {
       throw new UnauthorizedException('해당 댓글을 삭제할 권한이 없습니다.');
     }
 
-    return await this.commentRepository.delete(comment);
+    await this.commentRepository.delete(commentId);
+
+    return { message: '해당 댓글이 삭제되었습니다.' }
   }
 
   

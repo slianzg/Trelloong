@@ -11,7 +11,7 @@ export class MemberService {
   constructor(
     @InjectRepository(Member)
     private readonly memberRepository: Repository<Member>,
-  ) {}
+  ) { }
 
   create(createMemberDto: CreateMemberDto) {
     return 'This action adds a new member';
@@ -34,9 +34,9 @@ export class MemberService {
   }
 
   async compare(boardId: number, assignedTo: number[]) {
-    for (let Id in assignedTo) {
-      const member = await this.memberRepository.findOne({
-        where: { boardId: +boardId, memberId: +Id },
+    for (let Id of assignedTo) {
+      const member = await this.memberRepository.findOne({  
+        where: { boardId: +boardId, userId: +Id },
       });
       if (_.isNil(member)) {
         throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
