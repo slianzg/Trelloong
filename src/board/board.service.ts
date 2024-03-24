@@ -30,7 +30,7 @@ export class BoardService {
     @InjectRepository(Member)
     private memberRepository: Repository<Member>,
     private sendEmailService: SendEmailService,
-    private readonly dataSource : DataSource
+    private readonly dataSource: DataSource,
   ) {}
 
   // 보드 생성

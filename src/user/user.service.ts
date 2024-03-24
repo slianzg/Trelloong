@@ -4,11 +4,17 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import { LoginDto } from '../user/dto/login.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import _ from 'lodash';
 import { JwtService } from '@nestjs/jwt';
-import { Injectable, ConflictException, NotFoundException, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 
 @Injectable()
 export class UserService {
@@ -16,6 +22,7 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private dataSource: DataSource,
   ) {}
 
   //회원가입
@@ -99,10 +106,27 @@ export class UserService {
       throw new UnauthorizedException('비밀번호를 확인해주세요.');
     }
 
-    const deletedUserEmail = `${user.email}_deleted_${Date.now()}`;
-    await this.userRepository.update(userId, { email: deletedUserEmail }); //삭제하려는 유저 이메일 변경
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    await this.userRepository.softDelete({ userId });
+    try {
+      const deletedUserEmail = `${user.email}_deleted_${Date.now()}`;
+      await queryRunner.manager.update(User, userId, {
+        email: deletedUserEmail,
+      }); //삭제하려는 유저 이메일 변경
+      await queryRunner.manager.softDelete(User, { userId });
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+      return {
+        status: 200,
+        message: '정상적으로 회원탈퇴 되었습니다.',
+      };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      return { status: err.status, message: err };
+    }
   }
 
   //이메일로 회원정보 찾기(이메일 중복확인+jwtStrategy에서 사용)
