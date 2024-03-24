@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, Not, Repository } from 'typeorm';
 import _ from 'lodash';
 import { MemberGuard } from 'src/auth/member.guard';
 import { MemberService } from 'src/member/member.service';
@@ -114,10 +114,10 @@ export class CardService {
     await this.cardRepository
       .createQueryBuilder()
       .update(Card)
-      .set({ cardOrder: () => 'cardOrder-1' })
-      .where('columnId = :columnId AND cardOrder > :deleteCardOrder', {
-        columnId: deletedCard.columnsId,
-        deleteCardOrder,
+      .set({ cardOrder: () => 'card_order-1' })
+      .where('columnsId = :columnsId AND cardOrder > :deleteCardOrder', {
+        columnsId: deletedCard.columnsId,
+        deleteCardOrder: deleteCardOrder,
       })
       .execute();
   }
@@ -147,7 +147,7 @@ export class CardService {
       await this.cardRepository
         .createQueryBuilder()
         .update(Card)
-        .set({ cardOrder: () => 'cardOrder-1' })
+        .set({ cardOrder: () => 'card_order-1' })
         .where('columnId = :prevColumnId AND cardOrder >= :prevCardOrder', {
           prevColumnId,
           prevCardOrder,
@@ -157,7 +157,7 @@ export class CardService {
       await this.cardRepository
         .createQueryBuilder()
         .update(Card)
-        .set({ cardOrder: () => 'cardOrder+1' })
+        .set({ cardOrder: () => 'card_order+1' })
         .where('columnId=:columnId AND cardOrder >= :cardOrder', {
           columnsId,
           cardOrder: inputOrder,
@@ -192,6 +192,19 @@ export class CardService {
       await this.cardRepository.save(cardUpdate);
     }
     await this.cardRepository.save(card);
+  }
+
+  async setDueDate(columnsId: number, cardId: number, dueDate: Date) {
+
+    const card = await this.findOne(columnsId, cardId);
+    if(!card) {
+      throw new NotFoundException('해당 카드를 찾을 수 없습니다.')
+    }
+
+    card.dueDate = new Date(dueDate);
+    
+    const setDueDate = await this.cardRepository.save(card);
+    return setDueDate
   }
 }
 
