@@ -53,12 +53,15 @@ export class BoardService {
         verificationToken: null,
       });
       await queryRunner.commitTransaction();
-      return boardInfo;
-    } catch (error) {
+      return {
+        status: 200,
+        message: '보드 생성이 완료 되었습니다.',
+        boardInfo,
+      };
+    } catch (err) {
       await queryRunner.rollbackTransaction();
-      throw error;
-    } finally {
       await queryRunner.release();
+      return { status: err.status, message: err };
     }
   }
 

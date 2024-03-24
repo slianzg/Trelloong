@@ -15,16 +15,18 @@ import { CardService } from 'src/card/card.service';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('COMMENT')
 @UseGuards(MemberGuard)
 @Controller('board/:boardId/column/:columnId/card/:cardId/comment')
 export class CommentController {
   constructor(
     private readonly commentService: CommentService,
-    private readonly cardService: CardService,
   ) {}
 
   // 댓글 생성
+  @ApiOperation({ summary: '댓글 생성' })
   @Post('create')
   async createComment(
     @Param('cardId') cardId: number,
@@ -44,6 +46,7 @@ export class CommentController {
   }
 
   // 댓글 목록 조회
+  @ApiOperation({ summary: '댓글 목록 조회' })
   @Get('commentList')
   async findAllComments(@Param('cardId') cardId: number) {
     try {
@@ -54,6 +57,7 @@ export class CommentController {
   }
 
   // 댓글 수정
+  @ApiOperation({ summary: '댓글 수정' })
   @Patch('update/:commentId')
   async updateComment(
     @Param('commentId') commentId: number,
@@ -74,6 +78,7 @@ export class CommentController {
   }
 
   // 댓글 삭제
+  @ApiOperation({ summary: '댓글 삭제' })
   @Delete('delete/:commentId')
   async deleteComment(@Param('commentId') commentId: number, @Req() req) {
     try {

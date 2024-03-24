@@ -14,13 +14,16 @@ import { UpdateColumnDto } from './dto/update-column.dto';
 import { Columns } from './entities/column.entity';
 import { UpdateColumnOrderDto } from './dto/updatecolumnorder-column.dto';
 import { MemberGuard } from 'src/auth/member.guard';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('COLUMN')
 @UseGuards(MemberGuard)
 @Controller('board/:boardId/column')
 export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
 
-  //컬럼 생성
+  // 컬럼 생성
+  @ApiOperation({ summary: '컬럼 생성' })
   @UseGuards(MemberGuard)
   @Post('create')
   async create(
@@ -37,13 +40,15 @@ export class ColumnsController {
     };
   }
 
-  //컬럼 목록 조회
+  // 컬럼 목록 조회
+  @ApiOperation({ summary: '컬럼 목록 조회' })
   @Get('list')
   async findAll(@Param('boardId') boardId: number): Promise<Columns[]> {
     return await this.columnsService.findAll(boardId);
   }
 
-  //컬럼 상세 조회
+  // 컬럼 상세 조회
+  @ApiOperation({ summary: '컬럼 상세 조회' })
   @Get('info/:columnId')
   async findOne(
     @Param('boardId') boardId: number,
@@ -52,7 +57,8 @@ export class ColumnsController {
     return await this.columnsService.findOne(boardId, columnId);
   }
 
-  //컬럼 정보 수정
+  // 컬럼 정보 수정
+  @ApiOperation({ summary: '컬럼 정보 수정' })
   @Patch('update/:columnId')
   async update(
     @Param('boardId') boardId: number,
@@ -67,7 +73,8 @@ export class ColumnsController {
     return { message: '수정되었습니다' };
   }
 
-  //컬럼 순서 변경
+  // 컬럼 순서 변경
+  @ApiOperation({ summary: '컬럼 순서 변경' })
   @Patch('move/:columnId')
   async updateColumnOrder(
     @Param('columnId') columnId: number,
@@ -82,7 +89,8 @@ export class ColumnsController {
     return { message: '컬럼 순서가 수정되었습니다.' };
   }
 
-  //컬럼 삭제
+  // 컬럼 삭제
+  @ApiOperation({ summary: '컬럼 삭제' })
   @Delete('delete/:columnId')
   async remove(
     @Param('boardId') boardId: number,

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 import {
   Column,
@@ -17,6 +18,7 @@ export class Comment {
   @IsString()
   @Column('varchar', { nullable: false })
   @IsNotEmpty({ message: '내용을 입력하세요.' })
+  @ApiProperty({ example: '댓글 내용 안녕', description: '댓글 내용' })
   commentContent: string;
 
   @Column('int', { nullable: false })

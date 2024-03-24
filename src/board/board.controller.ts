@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
@@ -17,24 +18,32 @@ import { AuthGuard } from '@nestjs/passport';
 import { InviteBoardDto } from './dto/inviteBoard.dto';
 import { AuthConfirmDto } from './dto/authConfirm.dto';
 import { AdminGuard } from 'src/auth/admin.guard';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('BOARD')
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   // 보드 생성
+  @ApiOperation({ summary: '보드 생성' })
   @UseGuards(AuthGuard('jwt'))
   @Post('create')
-  async createBoard(@Body() createBoardDto: CreateBoardDto, @Req() req) {
+  async createBoard(
+    @Body() createBoardDto: CreateBoardDto,
+    @Req() req,
+    @Res() res,
+  ) {
     const { userId } = req.user;
     const boardInfo = await this.boardService.createBoard(
       createBoardDto,
       userId,
     );
-    return { message: '보드 생성이 완료되었습니다.', boardInfo };
+    return res.status(boardInfo.status).send(`${boardInfo.message}`);
   }
 
   // 인증 확인
+  @ApiOperation({ summary: '인증 확인' })
   @UseGuards(AuthGuard('jwt'))
   @Patch('verify')
   async confirmToken(@Body() authConfirmDto: AuthConfirmDto, @Req() req) {
@@ -44,6 +53,7 @@ export class BoardController {
   }
 
   // 보드 수정
+  @ApiOperation({ summary: '보드 수정' })
   @UseGuards(AdminGuard)
   @Patch('update/:boardId')
   async updatedBoard(
@@ -57,6 +67,7 @@ export class BoardController {
   }
 
   // 보드 삭제
+  @ApiOperation({ summary: '보드 삭제' })
   @UseGuards(AdminGuard)
   @Delete('delete/:boardId')
   async deleteBoard(
@@ -64,12 +75,13 @@ export class BoardController {
     @Param('boardId') boardId: number,
     @Body() deleteBoardDto: DeleteBoardDto,
   ) {
-    const { userEmail } = req.user.email
+    const { userEmail } = req.user.email;
     await this.boardService.deleteBoard(userEmail, boardId, deleteBoardDto);
     return { message: '보드 삭제가 완료되었습니다.' };
   }
 
   // 보드 목록
+  @ApiOperation({ summary: '보드 목록' })
   @UseGuards(AuthGuard('jwt'))
   @Get('list')
   async boardList(@Req() req) {
@@ -79,6 +91,7 @@ export class BoardController {
   }
 
   // 멤버 초대
+  @ApiOperation({ summary: '멤버 초대' })
   @UseGuards(AdminGuard)
   @Post('invite/:boardId')
   async inviteMember(
