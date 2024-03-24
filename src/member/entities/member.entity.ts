@@ -36,4 +36,3 @@ export class Member {
   @Column({ type: 'int', select: false, nullable: true })
   verificationToken: number;
 }
-

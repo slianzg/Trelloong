@@ -1,34 +1,175 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
 import { Card } from './entities/card.entity';
+import { Repository } from 'typeorm';
+import _ from 'lodash';
+import { MemberGuard } from 'src/auth/member.guard';
 
+@UseGuards(MemberGuard)
 @Injectable()
 export class CardService {
-    constructor(
-        @InjectRepository(Card) private readonly cardRepository: Repository<Card>
+  constructor(
+    @InjectRepository(Card)
+    private readonly cardRepository: Repository<Card>,
+    private readonly memberService: MemberService,
   ) {}
-    
-  async setDueDate(cardId: number, dueDate: Date) {
-    // cardRepository에서 cardId가 있는지 확인
-    const card = await this.findCardById(cardId);
 
-    // 해당 카드에 dueDate를 새로운 dueDate로 바꿔주고 setDudate에 저장
-    card.dueDate = dueDate;
-    const setDueDate = await this.cardRepository.save(card);
-    return setDueDate
+  async create(createCardDto: CreateCardDto, columnsId: number) {
+    const { cardName } = createCardDto;
+
+    const card = await this.cardRepository.findOne({
+      where: { columnsId },
+      order: { cardOrder: 'DESC' },
+    });
+
+    let cardOrder = 1;
+
+    if (card) {
+      cardOrder = +card.cardOrder + 1;
+    }
+
+    await this.cardRepository.save({
+      cardName,
+      columnsId,
+      cardOrder: +cardOrder,
+    });
   }
 
-  // 해당 카드가 레포지터리에 없을때
-  async findCardById(cardId: number) {
-    const card = await this.cardRepository.findOneBy({ cardId })
-    if(!card) {
-        throw new NotFoundException ('해당카드를 찾을수 없습니다.')
+  findAll(columnsId: number): Promise<Card[]> {
+    return this.cardRepository.find({
+      where: { columnsId },
+    });
+  }
+
+  findOne(columnsId: number, cardId: number) {
+    const card = this.cardRepository.findOneBy({ columnsId, cardId });
+    if (_.isNil(card)) {
+      throw new NotFoundException('해당 카드를 찾을 수 없습니다.');
     }
     return card;
   }
 
-  
+  async cardUpdate(
+    boardId: number,
+    columnsId: number,
+    cardId: number,
+    updateCardeDto: UpdateCardDto,
+  ) {
+    const { cardName, cardDescription, cardColor, assignedTo } = updateCardeDto;
+
+    const card = await this.cardRepository.findOneBy({
+      columnsId: +columnsId,
+      cardId: +cardId,
+    });
+
+    if (_.isNil(card)) {
+      throw new NotFoundException('카드를 찾지 못 했습니다.');
+    }
+
+    if (cardName) {
+      card.cardName = cardName;
+    }
+    if (cardDescription) {
+      card.cardDescription = cardDescription;
+    }
+    if (cardColor) {
+      card.cardColor = cardColor;
+    }
+    if (assignedTo) {
+      await this.memberService.compare(+boardId, assignedTo);
+      for (let existId in card.assignedTo) {
+        for (let inputId in assignedTo) {
+          +existId === +inputId
+            ? existId === null
+            : card.assignedTo.push(+inputId);
+        }
+      }
+    }
+
+    await this.cardRepository.save(card);
+  }
+
+  async delete(columnsId: number, cardId: number) {
+    const deletedCard = await this.findOne(columnsId, cardId);
+    if (!deletedCard) {
+      throw new NotFoundException('해당 카드를 찾을 수 없습니다');
+    }
+
+    const deleteCardOrder = deletedCard.cardOrder;
+
+    await this.cardRepository.delete({ columnsId, cardId });
+
+    await this.cardRepository
+      .createQueryBuilder()
+      .update(Card)
+      .set({ cardOrder: () => 'cardOrder-1' })
+      .where('columnId = :columnId AND cardOrder > :deleteCardOrder', {
+        columnId: deletedCard.columnsId,
+        deleteCardOrder,
+      })
+      .execute();
+  }
+
+  async updateCardOrder(cardId: number, columnId: number, cardOrder: number) {
+    const card = await this.cardRepository.findOne({ where: { cardId } });
+    const prevColumnId = card.columnsId;
+    const prevCardOrder = card.cardOrder;
+
+    if (columnId === prevColumnId) {
+      if (prevCardOrder < cardOrder) {
+        // prevCardOrder+1 ~ 가고싶은 cardOrder까지인 애들이 -1씩
+        await this.moveCard(card, prevCardOrder + 1, cardOrder, -1);
+      } else {
+        // prevCardOrder-1 ~ 가고싶은 cardOrder까지인 애들이 +1씩
+        await this.moveCard(card, prevCardOrder - 1, cardOrder, +1);
+      }
+    } else {
+      // 1. previousColumnId 인 카드들은 previousCardOrder보다 뒤에있는 카드라면 전부 순서가 1씩 당겨져야 한다.
+      await this.cardRepository
+        .createQueryBuilder()
+        .update(Card)
+        .set({ cardOrder: () => 'cardOrder-1' })
+        .where('columnId = :prevColumnId AND cardOrder >= :prevCardOrder', {
+          prevColumnId,
+          prevCardOrder,
+        })
+        .execute();
+      // 2. columnId 인 카드들은 cardOrder보다 뒤에있는 카드라면 전부 순서가 뒤로 +1씩 늘어나야한다.
+      await this.cardRepository
+        .createQueryBuilder()
+        .update(Card)
+        .set({ cardOrder: () => 'cardOrder+1' })
+        .where('columnId=:columnId AND cardOrder >= :cardOrder', {
+          columnId,
+          cardOrder,
+        })
+        .execute();
+
+      await this.cardRepository
+        .createQueryBuilder()
+        .update(Card)
+        .set({ cardOrder: cardOrder, columnsId: columnId })
+        .where('cardId = cardID', { cardId })
+        .execute();
+    }
+  }
+
+  async moveCard(
+    card: Card,
+    startOrder: number,
+    endOrder: number,
+    step: number,
+  ) {
+    const cardsUpdate = await this.cardRepository.find({
+      where: {
+        columnsId: card.columnsId,
+        cardOrder: Between(startOrder, endOrder),
+      },
+    });
+    for (const cardUpdate of cardsUpdate) {
+      if (cardUpdate.cardId === card.cardId) continue;
+      cardUpdate.cardOrder += step;
+      await this.cardRepository.save(cardUpdate);
+    }
+  }
 }

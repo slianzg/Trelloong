@@ -9,8 +9,8 @@ import {
 } from 'typeorm';
 
 @Entity({
-    name: 'users',
-  })
+  name: 'users',
+})
 export class User {
   @PrimaryGeneratedColumn()
   userId: number;
