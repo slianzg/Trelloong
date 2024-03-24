@@ -36,14 +36,12 @@ export class CommentService {
 
   async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto) {
     const comment = await this.findCommentById(commentId);
-    console.log('--------userId', userId);
-    console.log('--------comment', comment);
 
     if (comment.userId !== userId) {
       throw new UnauthorizedException('해당 댓글을 수정할 권한이 없습니다.');
     }
 
-    const updateComment = await this.commentRepository.update(comment, updateCommentDto);
+    const updateComment = await this.commentRepository.update(commentId, updateCommentDto);
 
     return updateComment;
   }

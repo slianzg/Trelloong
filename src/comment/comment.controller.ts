@@ -1,11 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Req } from '@nestjs/common';
 import { validate } from 'class-validator';
-import { userInfo } from 'os';
 import { MemberGuard } from 'src/auth/member.guard';
 import { CardService } from 'src/card/card.service';
 import { Member } from 'src/member/entities/member.entity';
-import { MemberInfo } from 'util/memberInfo.decorator';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -23,12 +20,12 @@ export class CommentController {
     @Param("columnId") columnId: number,
     @Param("cardId") cardId: number,
     @Body() createCommentDto: CreateCommentDto,
-    @MemberInfo() member: Member,
+    @Req () req
   ) {
     try {
       await validate(createCommentDto)
 
-      createCommentDto.userId = member.userId;
+      createCommentDto.userId = req.user.userId;
 
       await this.cardService.findOne(columnId, cardId);
       createCommentDto.cardId = cardId;
@@ -56,11 +53,12 @@ export class CommentController {
   @Patch('update/:commentId')
   async updateComment(
     @Param('commentId') commentId: number,
-    @MemberInfo() member: Member,
+    @Req () req,
     @Body() updateCommentDto: UpdateCommentDto
   ) {
     try {
-      await this.commentService.updateComment(commentId, member.userId, updateCommentDto);
+      const { userId } = req.user
+      await this.commentService.updateComment(commentId, userId, updateCommentDto);
       return { message: '해당 댓글이 수정되었습니다.' };
     } catch (err) {
       return { message: `${err}` };
@@ -70,10 +68,11 @@ export class CommentController {
   @Delete('delete/:commentId')
   async deleteComment(
     @Param('commentId') commentId: number,
-    @MemberInfo() member: Member,
+    @Req () req,
   ) {
     try {
-      return await this.commentService.deleteComment(commentId, member.userId);
+      const { userId } = req.user
+      return await this.commentService.deleteComment(commentId, userId);
     } catch (err) {
       return { message: `${err}` };
     }

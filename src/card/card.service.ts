@@ -46,8 +46,8 @@ export class CardService {
     });
   }
 
-  findOne(columnsId: number, cardId: number) {
-    const card = this.cardRepository.findOneBy({ columnsId, cardId });
+  async findOne(columnsId: number, cardId: number) {
+    const card = await this.cardRepository.findOneBy({ columnsId, cardId });
     if (_.isNil(card)) {
       throw new NotFoundException('해당 카드를 찾을 수 없습니다.');
     }
