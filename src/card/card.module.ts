@@ -4,10 +4,9 @@ import { CardController } from './card.controller';
 import { MemberModule } from 'src/member/member.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
-import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Card]), UserModule, MemberModule],
+  imports: [TypeOrmModule.forFeature([Card]), MemberModule],
   controllers: [CardController],
   providers: [CardService],
   exports: [CardService],

@@ -9,8 +9,9 @@ export class MemberService {
   constructor(
     @InjectRepository(Member)
     private readonly memberRepository: Repository<Member>,
-  ) { }
+  ) {}
 
+  // memberGuard에서 사용
   async findMember(boardId: number, userId: number) {
     return await this.memberRepository.findOne({ where: { boardId, userId } });
   }

@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
-import { Between, Not, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import _ from 'lodash';
-import { MemberGuard } from 'src/auth/member.guard';
 import { MemberService } from 'src/member/member.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -15,7 +14,7 @@ export class CardService {
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
     private readonly memberService: MemberService,
-  ) { }
+  ) {}
 
   async create(createCardDto: CreateCardDto, columnsId: number) {
     const { cardName } = createCardDto;
@@ -61,7 +60,6 @@ export class CardService {
     updateCardeDto: UpdateCardDto,
   ) {
     const { cardName, cardDescription, cardColor, assignedTo } = updateCardeDto;
-    console.log("========", assignedTo)
     const card = await this.cardRepository.findOneBy({
       columnsId: +columnsId,
       cardId: +cardId,
@@ -97,7 +95,6 @@ export class CardService {
         }
       }
     }
-    console.log("-------", card);
     return await this.cardRepository.save(card);
   }
 
@@ -195,16 +192,14 @@ export class CardService {
   }
 
   async setDueDate(columnsId: number, cardId: number, dueDate: Date) {
-
     const card = await this.findOne(columnsId, cardId);
-    if(!card) {
-      throw new NotFoundException('해당 카드를 찾을 수 없습니다.')
+    if (!card) {
+      throw new NotFoundException('해당 카드를 찾을 수 없습니다.');
     }
 
     card.dueDate = new Date(dueDate);
-    
+
     const setDueDate = await this.cardRepository.save(card);
-    return setDueDate
+    return setDueDate;
   }
 }
-
