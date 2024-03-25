@@ -42,6 +42,7 @@ export class CardService {
   findAll(columnsId: number): Promise<Card[]> {
     return this.cardRepository.find({
       where: { columnsId },
+      order: { cardOrder: 'ASC' },
     });
   }
 
@@ -81,7 +82,7 @@ export class CardService {
 
     if (assignedTo) {
       await this.memberService.compare(+boardId, assignedTo);
-      if (_.isNil(card.assignedTo)) {
+      if (_.isNil(card.assignedTo) || card.assignedTo.length === 0) {
         card.assignedTo = [];
         card.assignedTo.push(+assignedTo);
       } else {
