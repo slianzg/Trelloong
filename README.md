@@ -24,7 +24,7 @@
 ## 웅웅!(10조) 팀원
 
 **서 린** https://github.com/slianzg 
-역할: 팀장, PR 관리, 유저관련CRUD, Guard 기능, EC2 배포
+역할: 팀장, PR 관리, 유저관련CRUD, Guard 기능
 
 **김성진** https://github.com/castlejinni1226
 역할: 댓글 CRUD, 카드 마감날짜 지정 기능, 발표, 시연영상제작
@@ -36,7 +36,7 @@
 역할: 카드 CRUD, 카드의 이동(컬럼,순서) 기능
 
 **조민근** https://github.com/alsgeun
-역할: 서기, 보드 CRUD, nodemailer로 초대 기능, Guard 기능
+역할: 서기, 보드 CRUD, nodemailer로 초대 기능, Guard 기능, EC2 배포
 
 ## 구현 기능
 - 필수 구현 목록
