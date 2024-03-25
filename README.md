@@ -1,5 +1,5 @@
 # Trelloong  
-- <a href="여기에 url">시연 영상</a> 
+- <a href="https://www.youtube.com/watch?v=5LRXkGrG3n8">시연 영상</a> 
 - <a href="https://drawsql.app/teams/team-2920/diagrams/trelloong">ERD</a>
 - <a href="https://www.notion.so/teamsparta/b62780932c6d43daa8967fdc561ec2b7?v=398f642500b04107a67f84cb94d489d8">API 명세서</a>
 - <a href="https://www.notion.so/teamsparta/d3a492dafc0745f7b2ebbe2b0c4be74b?pvs=4#0d5bd3f407764d8cb3a45823a0d795fd">와이어프레임</a>
